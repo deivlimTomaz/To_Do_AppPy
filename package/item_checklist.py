@@ -1,0 +1,32 @@
+class ItemChecklist:
+
+    def __init__(self, texto: str):
+        
+        self._feito = False
+        self._texto = texto
+
+
+    def marcar(self):
+
+        self._feito = True
+
+    def desmarcar(self):
+
+        self._feito = False
+
+    @property
+    def texto(self) -> str:
+
+        return self._texto
+
+    @property
+    def feito(self) -> bool:
+
+        return self._feito
+
+
+    def __str__(self) -> str:
+
+        status = "[X]" if self._feito else "[ ]"
+
+        return f"{status} - {self._texto}"
