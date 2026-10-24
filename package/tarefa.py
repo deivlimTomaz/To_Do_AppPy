@@ -37,9 +37,5 @@ class Tarefa(ABC):
         return not self._concluida and date.today() > self._data_vencimento
 
     @abstractmethod
-    def proximo_estado(self):
-        pass
-
-    @abstractmethod
     def concluir(self):
         self._concluida = True
