@@ -36,6 +36,10 @@ class Tarefa(ABC):
     
         return not self._concluida and date.today() > self._data_vencimento
 
+    @property
+    def id(self) -> int:
+        return self._id
+
     @abstractmethod
     def concluir(self):
         self._concluida = True
