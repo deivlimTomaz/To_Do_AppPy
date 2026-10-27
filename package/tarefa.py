@@ -43,3 +43,7 @@ class Tarefa(ABC):
     @abstractmethod
     def concluir(self):
         self._concluida = True
+
+    @property
+    def prioridade(self) -> Prioridade:
+        return self._prioridade
