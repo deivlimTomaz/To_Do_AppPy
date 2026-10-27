@@ -33,3 +33,7 @@ class Lista:
                 return self._tarefas.pop(indice)
 
         raise ValueError("Tarefa com ID especificado não foi encontrada")
+
+    @property
+    def tarefas(self):
+        return self._tarefas.copy()
