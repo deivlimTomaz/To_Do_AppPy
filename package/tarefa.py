@@ -36,6 +36,22 @@ class Tarefa(ABC):
     
         return not self._concluida and date.today() > self._data_vencimento
 
+    # Dicionário para serialização de objetos
+
+    def para_dict(self):
+        tipo = self.__class__.__name__ # Auxilia para encontrar o tipo da tarefa independente de qual seja
+        dados_dict = {
+            "id": self._id,
+            "titulo": self._titulo,
+            "descricao": self._descricao,
+            "concluida": self._concluida,
+            "prioridade": self._prioridade.name, # Serialização especial para JSON convertendo para string
+            "data_vencimento": self._data_vencimento.isoformat(), # Serialização especial para JSON convertendo para string
+            "tipo": tipo # Serialização especial do tipo de tarefa
+        }
+
+        return dados_dict
+    
     @property
     def id(self) -> int:
         return self._id
@@ -47,3 +63,5 @@ class Tarefa(ABC):
     @property
     def prioridade(self) -> Prioridade:
         return self._prioridade
+
+    
