@@ -1,3 +1,14 @@
-**/__pycache__/
-*.pyc
+# Cache do Python
+__pycache__/
+*.py[cod]
 
+# Ambientes virtuais
+.venv/
+venv/
+
+# Ferramentas e caches
+.pytest_cache/
+.mypy_cache/
+
+# Arquivos temporários
+*.log
