@@ -37,3 +37,6 @@ class TarefaRecorr(Tarefa):
     def concluir(self):
         super().concluir()
 
+    def para_dict(self):
+        super().para_dict()
+
