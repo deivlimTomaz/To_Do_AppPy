@@ -10,21 +10,26 @@ class Tarefa(ABC):
         self._descricao = descricao
         self._concluida = False
 
-        if not titulo.strip():
-            raise ValueError("Título não pode estar vazio!")
-    
+        # Verificação de string para o título
+        if isinstance(titulo, str):
+            # Verificação para o título não estar vazio
+            if not titulo.strip():
+                raise ValueError("Título não pode estar vazio!")
+        else:
+            raise TypeError("O título deve ser uma string!")
+
         self._titulo = titulo
 
-        if data_vencimento < date.today():
-            raise ValueError("A data de vencimento não pode ser uma data passada!")
+        if not isinstance(data_vencimento, date):
+            raise TypeError("Forneça a data no formato correto.")
 
         self._data_vencimento = data_vencimento
 
     def editar(self, novo_titulo: str, nova_descricao: str, nova_data: date):
-        
+
         if not novo_titulo.strip():
             raise ValueError("Título não pode estar vazio!")
-        
+
         if nova_data < date.today():
             raise ValueError("A data de vencimento não pode ser uma data passada!")
 
@@ -33,7 +38,7 @@ class Tarefa(ABC):
         self._data_vencimento = nova_data
 
     def esta_atrasada(self) -> bool:
-    
+
         return not self._concluida and date.today() > self._data_vencimento
 
     # Dicionário para serialização de objetos
@@ -51,7 +56,7 @@ class Tarefa(ABC):
         }
 
         return dados_dict
-    
+
     @property
     def id(self) -> int:
         return self._id
@@ -64,4 +69,6 @@ class Tarefa(ABC):
     def prioridade(self) -> Prioridade:
         return self._prioridade
 
-    
+    @property
+    def data_vencimento(self) -> date:
+        return self._data_vencimento
