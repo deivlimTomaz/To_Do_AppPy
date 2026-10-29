@@ -45,3 +45,15 @@ class TarefaChecklist(Tarefa):
             super().concluir()
         else:
             raise ValueError("A tarefa não pode ser concluída")
+
+    def para_dict(self):
+        dados = super().para_dict()
+        dados_lista = []
+
+        for item in self._itens:
+            dados_lista.append(item.para_dict())
+
+        dados.update({"itens": dados_lista})
+
+        return dados
+
