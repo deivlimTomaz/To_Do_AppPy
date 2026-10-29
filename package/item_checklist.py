@@ -24,6 +24,15 @@ class ItemChecklist:
 
         return self._feito
 
+    # Serialização dos objetos de item_checklist
+    def para_dict(self):
+        dados_item_check = {
+            "texto": self._texto,
+            "feito": self._feito
+        }
+
+        return dados_item_check
+
 
     def __str__(self) -> str:
 
