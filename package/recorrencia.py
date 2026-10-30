@@ -4,7 +4,7 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 
 class Recorrencia:
-   
+
     # Tabela com todas as frequências -> (singular, plural, argumento para relativedelta)
     _FREQUENCIAS = {
             "diaria": ("dia", "dias", "days"),
@@ -29,7 +29,7 @@ class Recorrencia:
         # Garante que o valor é um texto
         if not isinstance(valor, str):
             raise TypeError("A frequência deve ser uma string!")
-        
+
         # Remoção de espaços e padroniza em letras minúsculas
         valor = valor.strip().lower()
 
@@ -38,9 +38,9 @@ class Recorrencia:
             raise ValueError(f"Frequência inválida! Escolha entre: {list(Recorrencia._FREQUENCIAS)}")
 
         self._frequencia = valor
-    
+
     # Intervalo
-    
+
     @property
     def intervalo(self) -> int:
         # Retorna de quantas em quantas unidades a tarefa se repete
@@ -51,7 +51,7 @@ class Recorrencia:
         # Garante que o valor é inteiro
         if not isinstance(valor, int) or isinstance(valor, bool):
             raise TypeError("O intervalo precisa ser um inteiro!")
-        
+
         # Intervalo não pode ser negativo e nem zero
         if valor <= 0:
             raise ValueError("Intervalo inválido!")
@@ -79,6 +79,9 @@ class Recorrencia:
         if data_base is None:
             data_base = date.today()
 
+        if not isinstance(data_base, date):
+            raise TypeError("Data não está no formato correto!")
+
         # Descobre o nome do argumento do relativedelta ("days", "weeks", ...)
         _, _, argumento_tempo = Recorrencia._FREQUENCIAS[self._frequencia]
 
@@ -86,4 +89,3 @@ class Recorrencia:
         # O relativedelta ajusta sozinho meses de tamanhos diferentes
         # (ex.: 31/01 + 1 mês = 28/02)
         return data_base + relativedelta(**{argumento_tempo: self._intervalo})
-        
