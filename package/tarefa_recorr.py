@@ -1,36 +1,34 @@
 from package.tarefa import Tarefa
+from package.recorrencia import Recorrencia
 from datetime import date, timedelta
 
 class TarefaRecorr(Tarefa):
-    def __init__(self, id, titulo, descricao, prioridade, data_vencimento, frequencia: str):
+    def __init__(self, id, titulo, descricao, prioridade, data_vencimento, recorr: Recorrencia):
         super().__init__(id, titulo, descricao, prioridade, data_vencimento)
 
-        if not isinstance(frequencia, str):
-            raise TypeError("Frequência deve ser uma string")
+        if not isinstance(recorr, Recorrencia):
+            raise TypeError("O objeto não é uma instância de recorrência")
 
-        if not frequencia == "diaria" and not frequencia == "semanal":
-            raise ValueError("Frequência deve ser diária ou semanal")
-            
-        
-        self._frequencia = frequencia
+        self._recorrencia = recorr
 
-    
     def gerar_proxima(self, novo_id):
-        if self._frequencia == "diaria":
-            intervalo = timedelta(days=1)
-        elif self._frequencia == "semanal":
-            intervalo = timedelta(days=7)
+        frequencia = self._recorrencia.frequencia
+        intervalo = self._recorrencia.intervalo
         
+        # Só pode ser calculada uma nova data se a tarefa na data anterior for concluída
         if self._concluida == False:
             raise ValueError("A tarefa precisa ser concluída primeiro")
 
-        nova_data_venc = self._data_vencimento + intervalo
-        
-        while nova_data_venc < date.today():
-            nova_data_venc += intervalo
+        # Calcular a próxima data de vencimento da tarefa recorrente
+        calc_prox_data = self._recorrencia.proxima_data(self._data_vencimento)
 
-        proxima_tarefa = TarefaRecorr(novo_id, self._titulo, self._descricao, self._prioridade, nova_data_venc, self._frequencia)
-        
+        # Avança a partir da última ocorrência calculada e passa a calcular a data
+        while calc_prox_data < date.today():
+            calc_prox_data = self._recorrencia.proxima_data(calc_prox_data)
+
+        nova_recorrencia = Recorrencia(frequencia, intervalo)
+
+        proxima_tarefa = TarefaRecorr(novo_id, self._titulo, self._descricao, self._prioridade, calc_prox_data, nova_recorrencia)
 
         return proxima_tarefa
 
@@ -39,4 +37,3 @@ class TarefaRecorr(Tarefa):
 
     def para_dict(self):
         super().para_dict()
-
