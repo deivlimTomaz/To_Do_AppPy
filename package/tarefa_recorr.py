@@ -14,7 +14,7 @@ class TarefaRecorr(Tarefa):
     def gerar_proxima(self, novo_id):
         frequencia = self._recorrencia.frequencia
         intervalo = self._recorrencia.intervalo
-        
+
         # Só pode ser calculada uma nova data se a tarefa na data anterior for concluída
         if self._concluida == False:
             raise ValueError("A tarefa precisa ser concluída primeiro")
@@ -36,4 +36,13 @@ class TarefaRecorr(Tarefa):
         super().concluir()
 
     def para_dict(self):
-        super().para_dict()
+        # Armazena o dicionário herdado
+        dados = super().para_dict()
+
+        dados_recorr = {"frequencia": self._recorrencia.frequencia,
+                        "intervalo": self._recorrencia.intervalo
+                        }
+
+        dados.update({"recorrencia": dados_recorr})
+
+        return dados
