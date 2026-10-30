@@ -27,7 +27,7 @@ print('\n========== 2. CRIANDO DIFERENTES TIPOS DE TAREFA (HERANÇA) =========='
 simples = TarefaSimples(1, 'Ler capítulo', 'Ler material da disciplina', Prioridade.BAIXA, data_futura)
 checklist = TarefaChecklist(2, 'Estudar para cálculo 1', 'Revisão de derivadas e introdução de integrais', Prioridade.ALTA, data_futura)
 recorrente = TarefaRecorr(3, 'Praticar Python', 'Prática semanal', Prioridade.MEDIA,
-                         date.today(), Recorrencia('semanal', 1))
+                         date.today(), Recorrencia('semanal', 1)) # Recorrencia
 
 gerenciador.criar(simples)
 gerenciador.criar(checklist)
@@ -75,7 +75,7 @@ gerenciador.editar(simples, 'Ler dois capítulos', 'Ler mais conteúdo', data_fu
 print('Depois da edição:', simples.para_dict()['titulo'])
 print('Tarefas antes da exclusão:', [t.para_dict()['titulo'] for t in lista.tarefas])
 gerenciador.excluir(simples)
-#gerenciador.excluir(checklist)
+gerenciador.excluir(checklist)
 print('Tarefas após a exclusão:', [t.para_dict()['titulo'] for t in lista.tarefas])
 
 print('\n========== FIM DA DEMONSTRAÇÃO ==========')
