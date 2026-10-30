@@ -1,9 +1,3 @@
-"""Demonstração funcional para o vídeo do Nível 1.
-
-Coloque este arquivo na raiz do projeto, ao lado da pasta package.
-Execute: python demonstracao_nivel1.py
-"""
-
 from datetime import date, timedelta
 from pprint import pprint
 
@@ -31,7 +25,7 @@ print('Categoria da outra lista:', outra_lista.categoria.tipo)
 
 print('\n========== 2. CRIANDO DIFERENTES TIPOS DE TAREFA (HERANÇA) ==========')
 simples = TarefaSimples(1, 'Ler capítulo', 'Ler material da disciplina', Prioridade.BAIXA, data_futura)
-checklist = TarefaChecklist(2, 'Preparar apresentação', 'Organizar demonstração', Prioridade.ALTA, data_futura)
+checklist = TarefaChecklist(2, 'Estudar para cálculo 1', 'Revisão de derivadas e introdução de integrais', Prioridade.ALTA, data_futura)
 recorrente = TarefaRecorr(3, 'Praticar Python', 'Prática semanal', Prioridade.MEDIA,
                          date.today(), Recorrencia('semanal', 1))
 
@@ -42,8 +36,8 @@ for tarefa in lista.tarefas:
     print(f'{type(tarefa).__name__}: {tarefa.para_dict()["titulo"]} | vencimento: {tarefa.data_vencimento}')
 
 print('\n========== 3. CHECKLIST E ITENS (COMPOSIÇÃO) ==========')
-checklist.adicionar_item('Revisar UML')
-checklist.adicionar_item('Executar demonstração')
+checklist.adicionar_item('Revisar derivadas')
+checklist.adicionar_item('Começar integrais')
 print('Checklist antes de marcar os itens:')
 pprint(checklist.para_dict())
 print('Tentando concluir com itens pendentes...')
@@ -81,6 +75,7 @@ gerenciador.editar(simples, 'Ler dois capítulos', 'Ler mais conteúdo', data_fu
 print('Depois da edição:', simples.para_dict()['titulo'])
 print('Tarefas antes da exclusão:', [t.para_dict()['titulo'] for t in lista.tarefas])
 gerenciador.excluir(simples)
+#gerenciador.excluir(checklist)
 print('Tarefas após a exclusão:', [t.para_dict()['titulo'] for t in lista.tarefas])
 
 print('\n========== FIM DA DEMONSTRAÇÃO ==========')
