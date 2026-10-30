@@ -31,6 +31,7 @@ class GerenciadorTarefa:
 
         raise ValueError("Nenhuma tarefa com o ID procurado foi encontrada!")
 
+    # Polimorfismo
     def concluir(self, tarefa_procurada: Tarefa):
         if not isinstance(tarefa_procurada, Tarefa):
             raise TypeError("O objeto não é uma tarefa!")
