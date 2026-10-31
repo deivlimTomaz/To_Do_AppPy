@@ -59,3 +59,9 @@ class GerenciadorTarefa:
             if tarefa_cadastrada.prioridade == filtrar_prioridade:
                 prioridades_solicitadas.append(tarefa_cadastrada)
         return prioridades_solicitadas
+
+    @property
+    def lista(self):
+        return self._lista_tarefas
+
+        
