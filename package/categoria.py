@@ -19,4 +19,15 @@ class Categoria:
     def tipo(self) -> str:
         return self._tipo
 
+    def para_dict(self):
+        return {
+            "cor": self._cor,
+            "tipo": self._tipo
+        }
 
+    @classmethod
+    def de_dict(cls, dados):
+        return cls(
+            dados["cor"],
+            dados["tipo"]
+        )
