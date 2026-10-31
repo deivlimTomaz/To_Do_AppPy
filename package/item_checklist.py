@@ -24,6 +24,12 @@ class ItemChecklist:
 
         return self._feito
 
+    def __str__(self) -> str:
+
+        status = "[X]" if self._feito else "[ ]"
+
+        return f"{status} - {self._texto}"
+
     # Serialização dos objetos de item_checklist
     def para_dict(self):
         dados_item_check = {
@@ -32,13 +38,6 @@ class ItemChecklist:
         }
 
         return dados_item_check
-
-
-    def __str__(self) -> str:
-
-        status = "[X]" if self._feito else "[ ]"
-
-        return f"{status} - {self._texto}"
 
     # Desserialização
     @classmethod
