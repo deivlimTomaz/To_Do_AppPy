@@ -1,5 +1,6 @@
 from package.tarefa import Tarefa
 from package.categoria import Categoria
+from package.fabrica_tarefa import tarefa_de_dict
 
 class Lista:
 
@@ -13,7 +14,7 @@ class Lista:
 
         if not nome.strip():
             raise ValueError("Nome da lista não pode estar em branco!")
-        
+
         self._nome = nome
         self._categoria = categoria
         self._tarefas = []
@@ -49,3 +50,24 @@ class Lista:
     @property
     def nome(self) -> str:
         return self._nome
+
+    def para_dict(self):
+        return {
+            "nome": self._nome,
+            "categoria": self._categoria.para_dict(),
+            "tarefas": [tarefa.para_dict() for tarefa in self._tarefas]
+        }
+
+    @classmethod
+    def de_dict(cls, dados):
+        categoria = Categoria.de_dict(dados["categoria"])
+
+        lista = cls(
+            dados["nome"],
+            categoria
+        )
+
+        for tarefa in dados["tarefas"]:
+            lista.adicionar(tarefa_de_dict(tarefa))
+
+        return lista
