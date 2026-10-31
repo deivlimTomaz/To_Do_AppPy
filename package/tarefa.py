@@ -57,6 +57,12 @@ class Tarefa(ABC):
 
         return dados_dict
 
+    @classmethod
+    def de_dict(cls, dados):
+        return cls(
+            dados["tipo"]
+        )
+
     @property
     def id(self) -> int:
         return self._id
