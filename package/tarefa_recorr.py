@@ -1,5 +1,6 @@
 from package.tarefa import Tarefa
 from package.recorrencia import Recorrencia
+from package.prioridade import Prioridade
 from datetime import date, timedelta
 
 class TarefaRecorr(Tarefa):
@@ -39,10 +40,32 @@ class TarefaRecorr(Tarefa):
         # Armazena o dicionário herdado
         dados = super().para_dict()
 
-        dados_recorr = {"frequencia": self._recorrencia.frequencia,
-                        "intervalo": self._recorrencia.intervalo
-                        }
-
-        dados.update({"recorrencia": dados_recorr})
+        dados.update({"recorrencia": self._recorrencia.para_dict()})
 
         return dados
+
+    @classmethod
+    def de_dict(cls, dados: dict):
+        # Lendo cada dado do dicionário
+        extract_id = dados["id"]
+        extract_titulo = dados["titulo"]
+        extract_desc = dados["descricao"]
+
+        # Extração especial das prioridades
+        extract_prioridade = dados["prioridade"]
+        extract_prioridade = Prioridade[extract_prioridade]
+
+        # Extreação especial das datas da tarefa
+        extract_data = dados["data_vencimento"]
+        extract_data = date.fromisoformat(extract_data)
+
+        extract_recorr = Recorrencia.de_dict(dados["recorrencia"])
+
+        dados_recuperados = cls(extract_id, extract_titulo, extract_desc, extract_prioridade, extract_data, extract_recorr)
+
+        extract_estado = dados["concluida"]
+
+        if extract_estado:
+            dados_recuperados.concluir()
+
+        return dados_recuperados
