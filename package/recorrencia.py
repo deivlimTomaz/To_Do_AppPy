@@ -89,3 +89,21 @@ class Recorrencia:
         # O relativedelta ajusta sozinho meses de tamanhos diferentes
         # (ex.: 31/01 + 1 mês = 28/02)
         return data_base + relativedelta(**{argumento_tempo: self._intervalo})
+
+    def para_dict(self):
+        dados_recorr = {
+            "frequencia": self._frequencia,
+            "intervalo": self._intervalo
+        }
+
+        return dados_recorr
+
+    @classmethod
+    def de_dict(cls, dados: dict):
+        # Recuperação de dados da recorrência
+        extract_frequencia = dados["frequencia"]
+        extract_intervalo = dados["intervalo"]
+
+        dados_recorr_recuperados = cls(extract_frequencia, extract_intervalo)
+
+        return dados_recorr_recuperados
