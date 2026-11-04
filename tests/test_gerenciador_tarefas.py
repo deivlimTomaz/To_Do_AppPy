@@ -5,7 +5,7 @@ Execute a partir da raiz do projeto:
 """
 
 from datetime import date, timedelta
-
+from package.categoria import Categoria
 from package.gerenciador_tarefa import GerenciadorTarefa
 from package.lista import Lista
 from package.prioridade import Prioridade
@@ -59,7 +59,9 @@ def criar_tarefa(identificador, titulo, prioridade=Prioridade.MEDIA):
 
 def main():
     separar("TESTE 1 - CRIANDO LISTA E GERENCIADOR")
-    lista = Lista("Estudos")
+    categoria_estudos = Categoria("Azul", "Estudos")
+    lista = Lista("Estudos", categoria_estudos)
+
     gerenciador = GerenciadorTarefa(lista)
     print("Gerenciador criado para a lista 'Estudos'.")
 
@@ -170,7 +172,7 @@ def main():
 
     separar("TESTE 17 - FILTRO SEM RESULTADOS")
     # Uma lista nova começa vazia: qualquer prioridade deve retornar [].
-    gerenciador_vazio = GerenciadorTarefa(Lista("Vazia"))
+    gerenciador_vazio = GerenciadorTarefa(Lista("Vazia", categoria_estudos))
     resultado_vazio = gerenciador_vazio.filtrar(Prioridade.ALTA)
     print("Resultado:", resultado_vazio)
     mostrar_resultado(resultado_vazio == [], "Lista vazia retornada corretamente")
@@ -182,4 +184,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
