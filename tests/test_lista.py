@@ -1,6 +1,6 @@
 
 from datetime import date, timedelta
-
+from package.categoria import Categoria
 from package.lista import Lista
 from package.tarefa_simples import TarefaSimples
 from package.prioridade import Prioridade
@@ -24,14 +24,15 @@ def mostrar_tarefas(lista):
 def main():
     separar("TESTE 1 - CRIANDO UMA LISTA")
 
-    lista = Lista("Estudos")
+    categoria_estudos = Categoria("Azul", "Estudos")
+    lista = Lista("Estudos", categoria_estudos)
     print("Lista 'Estudos' criada com sucesso!")
 
 
     separar("TESTE 2 - VALIDANDO NOME VAZIO")
 
     try:
-        Lista("   ")
+        Lista("   ", categoria_estudos)
     except ValueError as erro:
         print(f"Erro esperado: {erro}")
 
@@ -158,4 +159,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
