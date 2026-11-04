@@ -30,6 +30,11 @@ class ItemChecklist:
 
         return f"{status} - {self._texto}"
 
+    def __repr__(self) -> str:
+        # Faz com que a exibição dentro de listas [] use a formatação do __str__
+        return self.__str__()
+
+
     # Serialização dos objetos de item_checklist
     def para_dict(self):
         dados_item_check = {
