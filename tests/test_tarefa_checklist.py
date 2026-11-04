@@ -25,7 +25,7 @@ tarefa.adicionar_item("Revisar código")
 tarefa.adicionar_item("Ensaiar apresentação")
 
 for indice, item in enumerate(tarefa._itens):
-    print(indice, "-", item["nome"], "| Feito:", item["feito"])
+    print(indice, "-", item.texto, "| Feito:", item._feito)
 
 print("\n3. Tentando concluir antes de finalizar os itens:")
 
@@ -47,7 +47,7 @@ tarefa.marcar_item(1)
 tarefa.marcar_item(2)
 
 for item in tarefa._itens:
-    print(item["nome"], "| Feito:", item["feito"])
+    print(item.texto, "| Feito:", item._feito)
 
 print("Todos feitos?", tarefa.todos_feitos())
 
@@ -72,4 +72,3 @@ except IndexError as erro:
     print("Erro esperado:", erro)
 
 print("\n=== FIM DA DEMONSTRAÇÃO ===")
-
