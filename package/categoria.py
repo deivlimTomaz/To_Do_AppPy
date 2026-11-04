@@ -7,9 +7,8 @@ class Categoria:
         if not isinstance(tipo, str) or not tipo.strip():
             raise TypeError("O tipo deve ser em texto")
 
-        self._cor = cor
-        self._tipo = tipo
-
+        self._cor = cor.strip()
+        self._tipo = tipo.strip()
 
     @property
     def cor(self) -> str:
