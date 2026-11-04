@@ -57,16 +57,20 @@ try:
 except ValueError as erro:
     print("Erro esperado:", erro)
 
-print("\n6. Tentando criar uma tarefa com data passada:")
+print("\n6. Verificando criação com data passada (Desserialização):")
 
 try:
-    TarefaDemonstracao(
-        3, "Tarefa inválida", "Descrição",
+    data_passada = date.today() - timedelta(days=1)
+    tarefa_passada = TarefaDemonstracao(
+        3, "Tarefa antiga", "Descrição",
         prioridade,
-        date.today() - timedelta(days=1)
+        data_passada
     )
-except ValueError as erro:
-    print("Erro esperado:", erro)
+    # Valida se o construtor aceitou a data com sucesso
+    assert tarefa_passada._data_vencimento == data_passada
+    print("OK - Tarefa aceitou data passada com sucesso no construtor.")
+except Exception as erro:
+    print("FALHA - Não deveria ter lançado erro ao passar data antiga:", erro)
+
 
 print("\n=== FIM DA DEMONSTRAÇÃO ===")
-
