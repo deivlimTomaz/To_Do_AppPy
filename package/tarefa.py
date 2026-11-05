@@ -5,10 +5,12 @@ from datetime import date
 class Tarefa(ABC):
 
     def __init__(self, id: int, titulo: str, descricao: str, prioridade: Prioridade, data_vencimento: date):
-        self._id = id
-        self._prioridade = prioridade
-        self._descricao = descricao
-        self._concluida = False
+        
+        if not isinstance(prioridade, Prioridade):
+            raise TypeError("Forneça uma prioridade válida!")
+
+        if not isinstance(descricao, str):
+            raise TypeError("Descrição deve ser uma string!")
 
         # Verificação de string para o título
         if isinstance(titulo, str):
@@ -18,17 +20,26 @@ class Tarefa(ABC):
         else:
             raise TypeError("O título deve ser uma string!")
 
-        self._titulo = titulo
-
         if not isinstance(data_vencimento, date):
             raise TypeError("Forneça a data no formato correto.")
 
+        self._id = id
+        self._prioridade = prioridade
+        self._descricao = descricao
+        self._concluida = False
+        self._titulo = titulo
         self._data_vencimento = data_vencimento
 
     def editar(self, novo_titulo: str, nova_descricao: str, nova_data: date):
 
-        if not novo_titulo.strip():
-            raise ValueError("Título não pode estar vazio!")
+        if isinstance(novo_titulo, str):
+            if not novo_titulo.strip():
+                raise ValueError("O título não pode estar vazio!")
+        else:
+            raise TypeError("O título deve ser uma string!")
+
+        if not isinstance(nova_descricao, str):
+            raise TypeError("A descricação deve ser uma string!")
 
         if nova_data < date.today():
             raise ValueError("A data de vencimento não pode ser uma data passada!")
@@ -56,13 +67,6 @@ class Tarefa(ABC):
         }
 
         return dados_dict
-
-    @classmethod
-    def de_dict(cls, dados):
-        return cls(
-            dados["tipo"]
-        )
-    
 
     @property
     def titulo(self) -> str:
