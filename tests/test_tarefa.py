@@ -22,12 +22,12 @@ tarefa = TarefaDemonstracao(
 )
 
 print("\n1. Tarefa criada:")
-print("ID:", tarefa._id)
-print("Título:", tarefa._titulo)
-print("Descrição:", tarefa._descricao)
-print("Prioridade:", tarefa._prioridade)
-print("Vencimento:", tarefa._data_vencimento)
-print("Concluída:", tarefa._concluida)
+print("ID:", tarefa.id)
+print("Título:", tarefa.titulo)
+print("Descrição:", tarefa.descricao)
+print("Prioridade:", tarefa.prioridade)
+print("Vencimento:", tarefa.data_vencimento)
+print("Concluída:", tarefa.concluida)
 
 print("\n2. Editando a tarefa...")
 tarefa.editar(
@@ -36,16 +36,16 @@ tarefa.editar(
     date.today() + timedelta(days=10)
 )
 
-print("Novo título:", tarefa._titulo)
-print("Nova descrição:", tarefa._descricao)
-print("Novo vencimento:", tarefa._data_vencimento)
+print("Novo título:", tarefa.titulo)
+print("Nova descrição:", tarefa.descricao)
+print("Novo vencimento:", tarefa.data_vencimento)
 
 print("\n3. Verificando atraso:")
 print("Está atrasada?", tarefa.esta_atrasada())
 
 print("\n4. Concluindo a tarefa...")
 tarefa.concluir()
-print("Concluída:", tarefa._concluida)
+print("Concluída:", tarefa.concluida)
 
 print("\n5. Tentando criar uma tarefa com título vazio:")
 
@@ -67,7 +67,7 @@ try:
         data_passada
     )
     # Valida se o construtor aceitou a data com sucesso
-    assert tarefa_passada._data_vencimento == data_passada
+    assert tarefa_passada.data_vencimento == data_passada
     print("OK - Tarefa aceitou data passada com sucesso no construtor.")
 except Exception as erro:
     print("FALHA - Não deveria ter lançado erro ao passar data antiga:", erro)
