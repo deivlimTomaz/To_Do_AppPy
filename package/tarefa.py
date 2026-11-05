@@ -62,6 +62,19 @@ class Tarefa(ABC):
         return cls(
             dados["tipo"]
         )
+    
+
+    @property
+    def titulo(self) -> str:
+        return self._titulo
+
+    @property
+    def descricao(self) -> str:
+        return self._descricao
+
+    @property
+    def concluida(self) -> bool:
+        return self._concluida
 
     @property
     def id(self) -> int:
