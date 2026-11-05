@@ -2,9 +2,13 @@ from abc import ABC, abstractmethod
 from package.prioridade import Prioridade
 from datetime import date
 
+class Status(Enum):
+    PENDENTE = "Pendente"
+    CONCLUIDA = "Concluída"
+
 class Tarefa(ABC):
 
-    def __init__(self, id: int, titulo: str, descricao: str, prioridade: Prioridade, data_vencimento: date):
+    def __init__(self, id: int, titulo: str, descricao: str, prioridade: Prioridade, data_vencimento: date, status=Status.PENDENTE):
 
         if not isinstance(prioridade, Prioridade):
             raise TypeError("Forneça uma prioridade válida!")
@@ -57,8 +61,8 @@ class Tarefa(ABC):
         return not self._concluida and date.today() > self._data_vencimento
 
     # Possibilidade de reabrir uma tarefa, _concluida retorna como False
-    def reabrir(self) -> None:
-        self._concluida = False
+    def reabrir(self):
+        self._status = Status.PENDENTE
 
     # Dicionário para serialização de objetos
 
@@ -85,8 +89,12 @@ class Tarefa(ABC):
         return self._descricao
 
     @property
-    def concluida(self) -> bool:
-        return self._concluida
+    def status(self):
+        return self._status
+
+    @property
+    def concluida(self):
+        return self._status == Status.CONCLUIDA
 
     @property
     def id(self) -> int:
@@ -94,7 +102,7 @@ class Tarefa(ABC):
 
     @abstractmethod
     def concluir(self):
-        self._concluida = True
+        self._concluida = Status.CONCLUIDA
 
     @property
     def prioridade(self) -> Prioridade:
