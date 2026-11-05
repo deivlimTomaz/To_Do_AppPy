@@ -29,7 +29,7 @@ class TarefaChecklist(Tarefa):
     def _validar_indice(self, indice):
 
         if not isinstance(indice, int):
-            raise TypeError("O índice é um número!")
+            raise TypeError("O índice deve ser um número!")
 
         if indice >= len(self._itens) or indice <= -1:
             raise IndexError("Não há essa quantidade de itens na sua tarefa!")
@@ -43,6 +43,23 @@ class TarefaChecklist(Tarefa):
 
         self._itens[indice].marcar()
 
+    def desmarcar_item(self, indice: int):
+
+        self._validar_indice(indice)
+
+        if self._concluida:
+            raise ValueError("Não é possível desmarcar itens com a tarefa concluída")
+
+        self._itens[indice].desmarcar()
+
+    def remover_item(self, indice: int):
+        self._validar_indice(indice)
+
+        if self._concluida:
+            raise ValueError("Não é possível remover itens com a tarefa concluída")
+
+        del self._itens[indice]
+
     def todos_feitos(self):
 
         if self._itens == []:
@@ -53,16 +70,19 @@ class TarefaChecklist(Tarefa):
         else:
             return False
 
+    def progresso(self): # Mecanismo para processar o total de itens feitos e o total geral de itens na tarefa
+        total = len(self._itens)
+
+        feitos = sum(1 for item in self._itens if item.feito)
+
+        return feitos, total
+
     def concluir(self):
 
         if self.todos_feitos():
             super().concluir()
         else:
             raise ValueError("A tarefa não pode ser concluída")
-
-    @abstractmethod
-    def indice(self) -> int:
-        return self._indice
 
     def para_dict(self):
         dados = super().para_dict()
@@ -86,7 +106,7 @@ class TarefaChecklist(Tarefa):
         extract_prioridade = dados["prioridade"]
         extract_prioridade = Prioridade[extract_prioridade]
 
-        # Extreação especial das datas da tarefa
+        # Extração especial das datas da tarefa
         extract_data = dados["data_vencimento"]
         extract_data = date.fromisoformat(extract_data)
 
