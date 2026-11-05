@@ -10,6 +10,10 @@ class TarefaChecklist(Tarefa):
 
         self._itens = []
 
+    @property
+    def itens(self):
+        return self._itens[:] # Cópia rasa da lista para impedir que modificações externas alterem o estado original.
+
     def adicionar_item(self, nome: str):
 
         if not nome.strip():
@@ -22,13 +26,20 @@ class TarefaChecklist(Tarefa):
 
         self._itens.append(novo_item)
 
-    def marcar_item(self, indice: int):
+    def _validar_indice(self, indice):
 
         if not isinstance(indice, int):
             raise TypeError("O índice é um número!")
 
         if indice >= len(self._itens) or indice <= -1:
             raise IndexError("Não há essa quantidade de itens na sua tarefa!")
+
+    def marcar_item(self, indice: int):
+
+        self._validar_indice(indice)
+
+        if self._concluida:
+            raise ValueError("Não é possível marcar itens com a tarefa concluída")
 
         self._itens[indice].marcar()
 
@@ -48,6 +59,10 @@ class TarefaChecklist(Tarefa):
             super().concluir()
         else:
             raise ValueError("A tarefa não pode ser concluída")
+
+    @abstractmethod
+    def indice(self) -> int:
+        return self._indice
 
     def para_dict(self):
         dados = super().para_dict()
