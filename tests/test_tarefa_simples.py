@@ -27,6 +27,7 @@ print("\n3. Editando tarefa simples...")
 tarefa.editar(
     "Revisar Python",
     "Estudar herança e polimorfismo",
+    Prioridade.ALTA,
     date.today() + timedelta(days=7)
 )
 
@@ -40,4 +41,3 @@ tarefa.concluir()
 print("Concluída:", tarefa._concluida)
 
 print("\n=== FIM DA DEMONSTRAÇÃO ===")
-

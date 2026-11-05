@@ -33,6 +33,7 @@ print("\n2. Editando a tarefa...")
 tarefa.editar(
     "Estudar herança",
     "Revisar classes abstratas",
+    Prioridade.ALTA,
     date.today() + timedelta(days=10)
 )
 

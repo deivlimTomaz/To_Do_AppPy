@@ -92,6 +92,7 @@ def main():
         tarefa1,
         "Estudar Python avançado",
         "Revisar classes, herança e propriedades",
+        Prioridade.ALTA,
         nova_data,
     )
     print("Título atualizado:", resultado_edicao._titulo)
@@ -109,14 +110,14 @@ def main():
     esperar_erro(
         ValueError,
         lambda: gerenciador.editar(
-            inexistente, "Novo título", "Nova descrição", nova_data
+            inexistente, "Novo título", "Nova descrição", Prioridade.ALTA, nova_data
         ),
     )
 
     separar("TESTE 8 - EDITANDO COM TÍTULO VAZIO")
     esperar_erro(
         ValueError,
-        lambda: gerenciador.editar(tarefa2, "   ", "Descrição", nova_data),
+        lambda: gerenciador.editar(tarefa2, "   ", "Descrição", Prioridade.ALTA, nova_data),
     )
 
     separar("TESTE 9 - CONCLUINDO UMA TAREFA")
@@ -166,7 +167,7 @@ def main():
     esperar_erro(ValueError, lambda: gerenciador.excluir(inexistente))
 
     separar("TESTE 16 - PARÂMETROS INVÁLIDOS NOS MÉTODOS")
-    esperar_erro(TypeError, lambda: gerenciador.editar("inválido", "A", "B", nova_data))
+    esperar_erro(TypeError, lambda: gerenciador.editar("inválido", "A", "B", Prioridade.ALTA, nova_data))
     esperar_erro(TypeError, lambda: gerenciador.concluir("inválido"))
     esperar_erro(TypeError, lambda: gerenciador.excluir("inválido"))
 

@@ -20,13 +20,13 @@ class GerenciadorTarefa:
 
         self._lista_tarefas.adicionar(tarefa)
 
-    def editar(self, tarefa_procurada: Tarefa, novo_titulo: str, nova_descricao: str, nova_data: date):
+    def editar(self, tarefa_procurada: Tarefa, novo_titulo: str, nova_descricao: str, nova_prioridade: Prioridade, nova_data: date):
         if not isinstance(tarefa_procurada, Tarefa):
             raise TypeError("O objeto não é uma tarefa!")
 
         for tarefa_cadastrada in self._lista_tarefas.tarefas:
             if tarefa_cadastrada.id == tarefa_procurada.id:
-                tarefa_cadastrada.editar(novo_titulo, nova_descricao, nova_data)
+                tarefa_cadastrada.editar(novo_titulo, nova_descricao, nova_prioridade, nova_data)
                 return tarefa_cadastrada
 
         raise ValueError("Nenhuma tarefa com o ID procurado foi encontrada!")
@@ -63,5 +63,3 @@ class GerenciadorTarefa:
     @property
     def lista(self):
         return self._lista_tarefas
-
-        

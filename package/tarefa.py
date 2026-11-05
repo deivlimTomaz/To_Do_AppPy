@@ -5,7 +5,7 @@ from datetime import date
 class Tarefa(ABC):
 
     def __init__(self, id: int, titulo: str, descricao: str, prioridade: Prioridade, data_vencimento: date):
-        
+
         if not isinstance(prioridade, Prioridade):
             raise TypeError("Forneça uma prioridade válida!")
 
@@ -30,7 +30,7 @@ class Tarefa(ABC):
         self._titulo = titulo
         self._data_vencimento = data_vencimento
 
-    def editar(self, novo_titulo: str, nova_descricao: str, nova_data: date):
+    def editar(self, novo_titulo: str, nova_descricao: str, nova_prioridade: Prioridade, nova_data: date):
 
         if isinstance(novo_titulo, str):
             if not novo_titulo.strip():
@@ -41,16 +41,24 @@ class Tarefa(ABC):
         if not isinstance(nova_descricao, str):
             raise TypeError("A descricação deve ser uma string!")
 
+        if not isinstance(nova_prioridade, Prioridade):
+            raise TypeError("Forneça uma prioridade válida!")
+
         if nova_data < date.today():
             raise ValueError("A data de vencimento não pode ser uma data passada!")
 
         self._titulo = novo_titulo
         self._descricao = nova_descricao
+        self._prioridade = nova_prioridade
         self._data_vencimento = nova_data
 
     def esta_atrasada(self) -> bool:
 
         return not self._concluida and date.today() > self._data_vencimento
+
+    # Possibilidade de reabrir uma tarefa, _concluida retorna como False
+    def reabrir(self) -> None:
+        self._concluida = False
 
     # Dicionário para serialização de objetos
 

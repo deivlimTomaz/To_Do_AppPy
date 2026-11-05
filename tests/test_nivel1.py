@@ -86,7 +86,7 @@ def main():
               'Gerenciador utiliza Prioridade para filtrar tarefas')
 
     secao('7. OPERAÇÕES DO GERENCIADOR')
-    gerenciador.editar(simples, 'Ler dois capítulos', 'Leitura ampliada', data_futura)
+    gerenciador.editar(simples, 'Ler dois capítulos', 'Leitura ampliada', Prioridade.MEDIA, data_futura)
     verificar(simples.para_dict()['titulo'] == 'Ler dois capítulos', 'Edição alterou o título')
     gerenciador.excluir(simples)
     verificar(len(lista.tarefas) == 2, 'Exclusão removeu a tarefa da lista')
