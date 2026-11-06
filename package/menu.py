@@ -165,22 +165,40 @@ class Menu:
         tarefa_checklist = TarefaChecklist(tarefa_id, **dados_comuns)
 
         while True:
-            add_item = input("Deseja adicionar um item? (S/N): ").strip().lower()
+            add_item = input("\nDeseja adicionar um item? (S/N): ").strip().lower()
             if add_item == "s":
-                item = input("Digite o item: ").strip()
+                item = input("\nDigite o item: ").strip()
                 if not item:
-                    print("O item não pode estar vazio!")
+                    print("\nO item não pode estar vazio!")
                     continue
                 tarefa_checklist.adicionar_item(item)
             elif add_item == "n":
                 break
             else:
-                print("Digite apenas sim ou não.")
+                print("\nDigite apenas sim ou não.")
             
         self._gerenciador.criar(tarefa_checklist)
         
         print("\nTarefa checklist criada com sucesso!")
         self.pausar()
+
+    # Exibição específica de itens checklist para o usuário
+    def _exibir_checklist(self, tarefa: TarefaChecklist):
+        
+        print("\nChecklist:")
+        itens = tarefa.itens
+
+        for item in itens:
+            if not item.feito:
+                print(f"    [ ] - {item.texto}")
+            else:
+                print(f"    [x] - {item.texto}")
+            
+        total = len(itens)
+
+        concluidos = sum(item.feito for item in itens)
+
+        print(f"\nProgresso: {concluidos}/{total} itens concluídos")
 
     def _criar_recorrente(self):
         pass
@@ -195,17 +213,23 @@ class Menu:
             return
 
         print("\n========== SUAS TAREFAS ==========")
-
+        
         for tarefa in tarefas:
-
+            
             status = "Concluída" if tarefa.concluida else "Pendente"
+            
+            # Atributos comuns a todas as tarefas
 
             print(f"\nID: {tarefa.id}")
             print(f"Título: {tarefa.titulo}")
             print(f"Prioridade: {tarefa.prioridade.name}")
             print(f"Vencimento: {tarefa.data_vencimento}")
             print(f"Status: {status}")
-            print(f"-" * 35)
+
+            if isinstance(tarefa, TarefaChecklist):
+                 self._exibir_checklist(tarefa)
+            
+            print("-" * 35)
         
         if self._executando:
             self.pausar()
