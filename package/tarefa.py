@@ -2,13 +2,9 @@ from abc import ABC, abstractmethod
 from package.prioridade import Prioridade
 from datetime import date
 
-class Status(Enum):
-    PENDENTE = "Pendente"
-    CONCLUIDA = "Concluída"
-
 class Tarefa(ABC):
 
-    def __init__(self, id: int, titulo: str, descricao: str, prioridade: Prioridade, data_vencimento: date, status=Status.PENDENTE):
+    def __init__(self, id: int, titulo: str, descricao: str, prioridade: Prioridade, data_vencimento: date):
 
         if not isinstance(prioridade, Prioridade):
             raise TypeError("Forneça uma prioridade válida!")
@@ -48,6 +44,9 @@ class Tarefa(ABC):
         if not isinstance(nova_prioridade, Prioridade):
             raise TypeError("Forneça uma prioridade válida!")
 
+        if not isinstance(nova_data, date):
+            raise TypeError("A data deve ser uma instância de date!")
+
         if nova_data < date.today():
             raise ValueError("A data de vencimento não pode ser uma data passada!")
 
@@ -60,9 +59,8 @@ class Tarefa(ABC):
 
         return not self._concluida and date.today() > self._data_vencimento
 
-    # Possibilidade de reabrir uma tarefa, _concluida retorna como False
     def reabrir(self):
-        self._status = Status.PENDENTE
+        self._concluida = False
 
     # Dicionário para serialização de objetos
 
@@ -89,20 +87,17 @@ class Tarefa(ABC):
         return self._descricao
 
     @property
-    def status(self):
-        return self._status
-
-    @property
-    def concluida(self):
-        return self._status == Status.CONCLUIDA
+    def concluida(self) -> bool:
+        return self._concluida
 
     @property
     def id(self) -> int:
-        return self._id
+        if not isinstance(id, int) or isinstance(id, bool):
+            raise TypeError("O ID deve ser um número inteiro!")
 
-    @abstractmethod
-    def concluir(self):
-        self._concluida = Status.CONCLUIDA
+        if id <= 0:
+            raise ValueError("O ID deve ser maior que zero!")
+        return self._id
 
     @property
     def prioridade(self) -> Prioridade:
@@ -111,3 +106,7 @@ class Tarefa(ABC):
     @property
     def data_vencimento(self) -> date:
         return self._data_vencimento
+
+    @abstractmethod
+    def concluir(self):
+        self._concluida = True

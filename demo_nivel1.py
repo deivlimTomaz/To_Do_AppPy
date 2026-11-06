@@ -71,7 +71,7 @@ for tarefa in gerenciador.filtrar(Prioridade.ALTA):
 
 print('\n========== 7. EDITANDO E EXCLUINDO TAREFAS ==========')
 print('Antes da edição:', simples.para_dict()['titulo'])
-gerenciador.editar(simples, 'Ler dois capítulos', 'Ler mais conteúdo', data_futura)
+gerenciador.editar(simples, 'Ler dois capítulos', 'Ler mais conteúdo', Prioridade.ALTA, data_futura)
 print('Depois da edição:', simples.para_dict()['titulo'])
 print('Tarefas antes da exclusão:', [t.para_dict()['titulo'] for t in lista.tarefas])
 gerenciador.excluir(simples)

@@ -11,9 +11,20 @@ class GerenciadorTarefa:
 
         self._lista_tarefas = lista_tarefas
 
+    def gerar_id(self) -> int:
+        tarefas = self._lista_tarefas.tarefas
+
+        if not tarefas:
+            return 1
+
+        return max(tarefa.id for tarefa in tarefas) + 1 # Procura o maior ID existente e acrescenta um para uma próxima tarefa criada
+
     def criar(self, tarefa: Tarefa):
         if not isinstance(tarefa, Tarefa):
             raise TypeError("O objeto não é uma tarefa!")
+
+        if any(t.id == tarefa.id for t in self._lista_tarefas.tarefas):
+            raise ValueError("Já existe uma tarefa com esse ID!")
 
         if tarefa.data_vencimento < date.today():
             raise ValueError("Erro: a data de vencimento não pode ser anterior à data atual.")
@@ -24,10 +35,11 @@ class GerenciadorTarefa:
         if not isinstance(tarefa_procurada, Tarefa):
             raise TypeError("O objeto não é uma tarefa!")
 
-        for tarefa_cadastrada in self._lista_tarefas.tarefas:
-            if tarefa_cadastrada.id == tarefa_procurada.id:
-                tarefa_cadastrada.editar(novo_titulo, nova_descricao, nova_prioridade, nova_data)
-                return tarefa_cadastrada
+        tarefa = self.buscar_por_id(tarefa_procurada.id)
+
+        tarefa.editar(novo_titulo, nova_descricao, nova_prioridade, nova_data)
+
+        return tarefa
 
         raise ValueError("Nenhuma tarefa com o ID procurado foi encontrada!")
 
@@ -36,10 +48,11 @@ class GerenciadorTarefa:
         if not isinstance(tarefa_procurada, Tarefa):
             raise TypeError("O objeto não é uma tarefa!")
 
-        for tarefa_cadastrada in self._lista_tarefas.tarefas:
-            if tarefa_cadastrada.id == tarefa_procurada.id:
-                tarefa_cadastrada.concluir()
-                return tarefa_cadastrada
+        tarefa = self.buscar_por_id(tarefa_procurada.id)
+
+        tarefa.concluir()
+
+        return tarefa
 
         raise ValueError("Nenhuma tarefa com o ID procurado foi encontrada!")
 
@@ -59,6 +72,13 @@ class GerenciadorTarefa:
             if tarefa_cadastrada.prioridade == filtrar_prioridade:
                 prioridades_solicitadas.append(tarefa_cadastrada)
         return prioridades_solicitadas
+
+    def buscar_por_id(self, id_tarefa: int):
+        for tarefa in self._lista_tarefas.tarefas:
+            if tarefa.id == id_tarefa:
+                return tarefa
+
+        raise ValueError("Tarefa não encontrada")
 
     @property
     def lista(self):
