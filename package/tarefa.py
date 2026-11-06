@@ -23,6 +23,12 @@ class Tarefa(ABC):
         if not isinstance(data_vencimento, date):
             raise TypeError("Forneça a data no formato correto.")
 
+        if not isinstance(id, int) or isinstance(id, bool):
+            raise TypeError("O ID deve ser um número inteiro!")
+
+        if id <= 0:
+            raise ValueError("O ID deve ser maior que zero!")
+
         self._id = id
         self._prioridade = prioridade
         self._descricao = descricao
@@ -92,11 +98,6 @@ class Tarefa(ABC):
 
     @property
     def id(self) -> int:
-        if not isinstance(id, int) or isinstance(id, bool):
-            raise TypeError("O ID deve ser um número inteiro!")
-
-        if id <= 0:
-            raise ValueError("O ID deve ser maior que zero!")
         return self._id
 
     @property
