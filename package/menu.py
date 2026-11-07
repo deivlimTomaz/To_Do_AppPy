@@ -3,6 +3,7 @@ from package.repositorio import Repositorio
 import os
 from package.prioridade import Prioridade
 from datetime import datetime, date
+from package.tarefa import Tarefa
 from package.tarefa_simples import TarefaSimples
 from package.tarefa_checklist import TarefaChecklist
 from package.tarefa_recorr import TarefaRecorr
@@ -20,6 +21,7 @@ class Menu:
         self._opcoes = {
                 "1": self.criar_tarefa, # Referência ao método criar_tarefa
                 "2": self.listar_tarefas, # Referência ao método listar_tarefas
+                "3": self.editar_tarefa,
                 "5": self.sair # Referência ao método sair
         }
 
@@ -34,6 +36,7 @@ class Menu:
             print("\n========== APP TO-DO ==========")
             print("1. Criar tarefa")
             print("2. Listar tarefas")
+            print("3. Editar tarefa")
             print("5. Sair")
             print("=" * 31)
 
@@ -277,6 +280,8 @@ class Menu:
             self.pausar()
             return
 
+        self.limpar_tela()
+
         print("\n========== SUAS TAREFAS ==========")
 
         for tarefa in tarefas:
@@ -301,6 +306,196 @@ class Menu:
 
         if self._executando:
             self.pausar()
+
+    def _listar_tarefas_resumidas(self):
+        tarefas = self._gerenciador.lista.tarefas
+
+        self.limpar_tela()
+
+        print("\n========== SELECIONAR TAREFA ==========")
+
+        for tarefa in tarefas:
+            print(f"[{tarefa.id}] - {tarefa.titulo}")
+
+        print("-" * 35)
+
+    def editar_tarefa(self):
+        tarefas = self._gerenciador.lista.tarefas
+
+        if not tarefas:
+            print("\nNenhuma tarefa cadastrada!")
+            self.pausar()
+            return
+
+        self._listar_tarefas_resumidas()
+
+        while True:
+
+            try:
+                id_tarefa = int(input("\nDigite o ID da tarefa (0 para voltar): "))
+
+            except ValueError:
+                print("\nInforme um número inteiro válido")
+                continue
+
+            if id_tarefa == 0:
+                return
+
+            if id_tarefa < 0:
+                print("\nInforme um ID positivo!")
+                continue
+
+            try:
+                tarefa = self._gerenciador.buscar_por_id(id_tarefa)
+            except ValueError:
+                print(f"\nNenhuma tarefa foi encontrada com o ID {id_tarefa}!")
+                continue
+
+            print(f"\nTarefa selecionada: {tarefa.titulo}")
+            break
+
+        # =========================================================
+        #               PARTE DO SUBMENU EDITAR
+        # =========================================================
+
+        submenu_editar = {
+            "1": self._alterar_titulo,
+            "2": self._alterar_descricao,
+            "3": self._alterar_prioridade,
+            "4": self._alterar_vencimento,
+            "5": self._concluir_tarefa,
+            "6": self._excluir_tarefa,
+        }
+
+        while True:
+
+            self.limpar_tela()
+
+            print("\n========== EDITAR TAREFA ==========")
+            print("\n1. Alterar título")
+            print("2. Alterar descrição")
+            print("3. Alterar prioridade")
+            print("4. Alterar vencimento")
+            print("5. Concluir tarefa")
+            print("6. Excluir tarefa")
+            print("7. Voltar\n")
+            print("=" * 34)
+
+            opcao_editar = input("O que deseja fazer? ").strip()
+
+            if opcao_editar == "7":
+                break
+
+            acao_editar = submenu_editar.get(opcao_editar)
+
+            if acao_editar is None:
+                print("\nOpção inválida")
+                self.pausar()
+                continue
+
+            acao_editar(tarefa)
+
+    def _alterar_titulo(self, tarefa: Tarefa):
+
+        self.limpar_tela()
+
+        print("\n========== ALTERAR TÍTULO ==========")
+        print(f"\nTítulo atual: {tarefa.titulo}")
+
+        while True:
+
+            novo_titulo = input("\nDigite o novo título: ").strip()
+
+            if novo_titulo:
+                break
+
+            print("O título não pode estar vazio!")
+
+        tarefa_editada = self._gerenciador.editar(tarefa, novo_titulo, tarefa.descricao, tarefa.prioridade, tarefa.data_vencimento)
+
+        print("\nTarefa editada com sucesso!")
+        self.pausar()
+
+    def _alterar_descricao(self, tarefa: Tarefa):
+
+        self.limpar_tela()
+
+        print("\n========== ALTERAR DESCRIÇÃO ==========")
+        print(f"\nDescrição atual: {tarefa.descricao}")
+
+        nova_descricao = input("\nDigite uma nova descriçao: ").strip()
+
+        tarefa_editada = self._gerenciador.editar(tarefa, tarefa.titulo, nova_descricao, tarefa.prioridade, tarefa.data_vencimento)
+
+        print("\nTarefa editada com sucesso")
+        self.pausar()
+
+
+    def _alterar_prioridade(self, tarefa: Tarefa):
+
+        self.limpar_tela()
+        print("\n========== ALTERAR PRIORIDADE ==========")
+        print(f"\nPrioridade atual: {tarefa.prioridade.name}")
+
+        print("\n========== PRIORIDADES DISPONÍVEIS ==========\n")
+        print("1. Baixa")
+        print("2. Média")
+        print("3. Alta\n")
+
+        opcoes_prioridade = {
+                "1": Prioridade.BAIXA,
+                "2": Prioridade.MEDIA,
+                "3": Prioridade.ALTA
+        }
+
+        while True:
+            opcao_prioridade = input("Escolha uma nova prioridade: ").strip()
+
+            nova_prioridade = opcoes_prioridade.get(opcao_prioridade)
+
+            if nova_prioridade is None:
+                print("\nOpção inválida")
+                continue
+
+            break
+
+        self._gerenciador.editar(tarefa, tarefa.titulo, tarefa.descricao, nova_prioridade, tarefa.data_vencimento)
+
+        print("\nTarefa editada com sucesso!")
+        self.pausar()
+
+
+    def _alterar_vencimento(self, tarefa: Tarefa):
+        self.limpar_tela()
+        data_atual = tarefa.data_vencimento.strftime("%d/%m/%Y")
+
+        print("\n========== ALTERAR DATA DE VENCIMENTO ==========")
+        print(f"\nData de vencimento atual: {data_atual}")
+
+        while True:
+            data_venc = input("Escolha uma nova data de vencimento: ")
+
+            try:
+                nova_data_venc = datetime.strptime(data_venc,"%d/%m/%Y").date()
+            except ValueError:
+                print("\nData inválida! Informe uma data válida.")
+                continue
+
+            if nova_data_venc < date.today():
+                print("\nData passada! Informe uma data a partir de hoje.")
+                continue
+            break
+
+        self._gerenciador.editar(tarefa, tarefa.titulo, tarefa.descricao, tarefa.prioridade, nova_data_venc)
+
+        print("\nTarefa editada com sucesso!")
+        self.pausar()
+
+    def _concluir_tarefa(self, tarefa):
+        pass
+
+    def _excluir_tarefa(self, tarefa):
+        pass
 
     def sair(self):
         print("\nEncerrando o aplicativo...")

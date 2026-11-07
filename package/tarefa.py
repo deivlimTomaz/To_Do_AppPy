@@ -53,8 +53,8 @@ class Tarefa(ABC):
         if not isinstance(nova_data, date):
             raise TypeError("A data deve ser uma instância de date!")
 
-        if nova_data < date.today():
-            raise ValueError("A data de vencimento não pode ser uma data passada!")
+        if nova_data != self._data_vencimento and nova_data < date.today():
+            raise ValueError("A nova data de vencimento não pode ser anterior à data atual!")
 
         self._titulo = novo_titulo
         self._descricao = nova_descricao
