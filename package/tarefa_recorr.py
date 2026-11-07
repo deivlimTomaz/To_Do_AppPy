@@ -69,3 +69,7 @@ class TarefaRecorr(Tarefa):
             dados_recuperados.concluir()
 
         return dados_recuperados
+
+    @property
+    def recorrencia(self) -> Recorrencia:
+        return self._recorrencia

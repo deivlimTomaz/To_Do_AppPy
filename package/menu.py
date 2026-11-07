@@ -5,6 +5,8 @@ from package.prioridade import Prioridade
 from datetime import datetime, date
 from package.tarefa_simples import TarefaSimples
 from package.tarefa_checklist import TarefaChecklist
+from package.tarefa_recorr import TarefaRecorr
+from package.recorrencia import Recorrencia
 
 class Menu:
 
@@ -26,7 +28,7 @@ class Menu:
     def mostrar_menu(self):
 
         while self._executando:
-            
+
             self.limpar_tela()
 
             print("\n========== APP TO-DO ==========")
@@ -36,7 +38,7 @@ class Menu:
             print("=" * 31)
 
             opcao = input("Escolha uma opção: ").strip()
-            
+
             # .get() pega a chave (número) escolhido pelo usuário e atribui à uma ação
             acao = self._opcoes.get(opcao)
 
@@ -49,7 +51,7 @@ class Menu:
 
 
     def criar_tarefa(self):
-        
+
         submenu_criar = {
                 "1": self._criar_simples,
                 "2": self._criar_checklist,
@@ -80,11 +82,8 @@ class Menu:
 
             acao_criar()
 
-            if not self._executando:
-                break
-
     def _coletar_dados_comuns(self):
-        
+
         # Solicitando dados
 
         while True:
@@ -92,20 +91,20 @@ class Menu:
             self.limpar_tela()
 
             titulo = input("Digite o título da tarefa: ").strip()
-            
+
             if titulo:
                 break
-            
+
             print("O título não pode estar vazio!")
 
-        
+
         descricao = input("\nDigite a descrição da tarefa: ").strip()
-        
+
         print("\n========== PRIORIDADE ==========\n")
         print("1. Baixa")
         print("2. Média")
         print("3. Alta\n")
-        
+
 
         opcoes_prioridade = {
                 "1": Prioridade.BAIXA,
@@ -115,7 +114,7 @@ class Menu:
 
         while True:
             opcao_prioridade = input("Escolha: ").strip()
-        
+
             acao_prioridade = opcoes_prioridade.get(opcao_prioridade)
 
             if acao_prioridade is None:
@@ -126,7 +125,7 @@ class Menu:
 
         while True:
             data = input("\nDigite a data de vencimento da tarefa (DD/MM/AAAA): ")
-            
+
             try:
                 data = datetime.strptime(data, "%d/%m/%Y").date()
 
@@ -145,7 +144,7 @@ class Menu:
                 "prioridade": acao_prioridade,
                 "data_vencimento": data
         }
-        
+
     def _criar_simples(self):
 
         dados_comuns = self._coletar_dados_comuns() # Chamar método de solicitação de dados
@@ -158,7 +157,7 @@ class Menu:
         self.pausar()
 
     def _criar_checklist(self):
-        
+
         dados_comuns = self._coletar_dados_comuns()
         tarefa_id = self._gerenciador.gerar_id()
 
@@ -176,15 +175,15 @@ class Menu:
                 break
             else:
                 print("\nDigite apenas sim ou não.")
-            
+
         self._gerenciador.criar(tarefa_checklist)
-        
+
         print("\nTarefa checklist criada com sucesso!")
         self.pausar()
 
     # Exibição específica de itens checklist para o usuário
     def _exibir_checklist(self, tarefa: TarefaChecklist):
-        
+
         print("\nChecklist:")
         itens = tarefa.itens
 
@@ -193,7 +192,7 @@ class Menu:
                 print(f"    [ ] - {item.texto}")
             else:
                 print(f"    [x] - {item.texto}")
-            
+
         total = len(itens)
 
         concluidos = sum(item.feito for item in itens)
@@ -201,10 +200,76 @@ class Menu:
         print(f"\nProgresso: {concluidos}/{total} itens concluídos")
 
     def _criar_recorrente(self):
-        pass
+        dados_comuns = self._coletar_dados_comuns()
+
+        print("\n========== FREQUÊNCIA ==========\n")
+        print("1. Diária")
+        print("2. Semanal")
+        print("3. Mensal")
+        print("4. Anual\n")
+
+        opcoes_frequencia = {
+            "1": "diaria",
+            "2": "semanal",
+            "3": "mensal",
+            "4": "anual"
+        }
+
+        while True:
+            opcao_frequencia = input("Escolha: ").strip()
+
+            frequencia = opcoes_frequencia.get(opcao_frequencia)
+
+            if frequencia is None:
+                print("\nOpção inválida")
+                continue
+            break
+
+        while True:
+            try:
+                intervalo = int(input("\nDigite o intervalo de tempo para a tarefa: "))
+                if intervalo <= 0:
+                    print("O intervalo deve ser maior que zero!")
+                    continue
+                break
+
+            except ValueError:
+                print("\nInforme um número inteiro válido.")
+
+        # Construção da recorrência
+        recorr = Recorrencia(frequencia, intervalo)
+
+        tarefa_id = self._gerenciador.gerar_id()
+
+        tarefa_recorr = TarefaRecorr(tarefa_id, **dados_comuns, recorr=recorr)
+
+        # Cadastro
+        self._gerenciador.criar(tarefa_recorr)
+
+        print("\nTarefa recorrente criada com sucesso!")
+        self.pausar()
+
+    def _exibir_recorr(self, tarefa: TarefaRecorr):
+
+        print("\nRecorrência:")
+        recorr = tarefa.recorrencia
+
+        unidades = {
+            "diaria": ("dia", "dias"),
+            "semanal": ("semana", "semanas"),
+            "mensal": ("mês", "meses"),
+            "anual": ("ano", "anos")
+        }
+
+        singular, plural = unidades[recorr.frequencia]
+
+        unidade = singular if recorr.intervalo == 1 else plural
+
+        print(f"Frequência: {recorr.frequencia.capitalize()}")
+        print(f"Intervalo: A cada {recorr.intervalo} {unidade}")
 
     def listar_tarefas(self):
-        
+
         tarefas = self._gerenciador.lista.tarefas
 
         if not tarefas:
@@ -213,11 +278,11 @@ class Menu:
             return
 
         print("\n========== SUAS TAREFAS ==========")
-        
+
         for tarefa in tarefas:
-            
+
             status = "Concluída" if tarefa.concluida else "Pendente"
-            
+
             # Atributos comuns a todas as tarefas
 
             print(f"\nID: {tarefa.id}")
@@ -227,10 +292,13 @@ class Menu:
             print(f"Status: {status}")
 
             if isinstance(tarefa, TarefaChecklist):
-                 self._exibir_checklist(tarefa)
-            
+                self._exibir_checklist(tarefa)
+
+            if isinstance(tarefa, TarefaRecorr):
+                self._exibir_recorr(tarefa)
+
             print("-" * 35)
-        
+
         if self._executando:
             self.pausar()
 
