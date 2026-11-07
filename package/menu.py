@@ -363,9 +363,12 @@ class Menu:
             "2": self._alterar_descricao,
             "3": self._alterar_prioridade,
             "4": self._alterar_vencimento,
-            "5": self._concluir_tarefa,
-            "6": self._excluir_tarefa,
+            "6": self._concluir_tarefa,
+            "7": self._excluir_tarefa,
         }
+
+        if isinstance(tarefa, TarefaChecklist):
+            submenu_editar["5"] = self._gerenciar_checklist
 
         while True:
 
@@ -376,14 +379,16 @@ class Menu:
             print("2. Alterar descrição")
             print("3. Alterar prioridade")
             print("4. Alterar vencimento")
-            print("5. Concluir tarefa")
-            print("6. Excluir tarefa")
-            print("7. Voltar\n")
+            if isinstance(tarefa, TarefaChecklist):
+                print("5. Gerenciar checklist")
+            print("6. Concluir tarefa")
+            print("7. Excluir tarefa")
+            print("8. Voltar\n")
             print("=" * 34)
 
             opcao_editar = input("O que deseja fazer? ").strip()
 
-            if opcao_editar == "7":
+            if opcao_editar == "8":
                 break
 
             acao_editar = submenu_editar.get(opcao_editar)
@@ -393,7 +398,10 @@ class Menu:
                 self.pausar()
                 continue
 
-            acao_editar(tarefa)
+            resultado = acao_editar(tarefa)
+
+            if opcao_editar == "7" and resultado is True:
+                break
 
     def _alterar_titulo(self, tarefa: Tarefa):
 
@@ -491,11 +499,118 @@ class Menu:
         print("\nTarefa editada com sucesso!")
         self.pausar()
 
-    def _concluir_tarefa(self, tarefa):
-        pass
+    def _gerenciar_checklist(self, tarefa: TarefaChecklist):
 
-    def _excluir_tarefa(self, tarefa):
-        pass
+        if not isinstance(tarefa, TarefaChecklist):
+            print("\nEsta tarefa não é do tipo checklist!")
+            self.pausar()
+            return
+
+        self.limpar_tela()
+
+        print("\n========== GERENCIAR CHECKLIST ==========")
+        print(f"Tarefa: {tarefa.titulo}")
+
+        itens = tarefa.itens
+
+        if not itens:
+            print("\nEste checklist não possui itens cadastrados.")
+            self.pausar()
+            return
+
+        for numero, item in enumerate(tarefa.itens, start=1):
+            status = "[x]" if item.feito else "[ ]"
+            print(f"{numero}. {status} {item.texto}")
+
+        while True:
+            try:
+                numero_item = int(input("\nDigite o número do item (0 para voltar): "))
+
+            except ValueError:
+                print("\nNúmero inválido.")
+                continue
+
+            if numero_item == 0:
+                return
+
+            if numero_item < 1 or numero_item > len(tarefa.itens):
+                print("\nEsse item não existe!")
+                continue
+            break
+
+        indice = numero_item - 1
+
+        try:
+            tarefa.marcar_item(indice)
+
+        except ValueError as erro:
+            print(f"\nNão foi possível marcar o item: {erro}")
+            self.pausar()
+            return
+
+        print("\nItem marcado com sucesso!")
+        self.pausar()
+
+    def _concluir_tarefa(self, tarefa: Tarefa):
+        self.limpar_tela()
+
+        if tarefa.concluida:
+            print("\nEssa tarefa já está concluída!")
+            self.pausar()
+            return
+
+        print("\n========== CONCLUIR TAREFA ==========")
+        print(f"\nTarefa selecionada: {tarefa.titulo}")
+        print(f"Status atual: {'Concluída' if tarefa.concluida else 'Pendente'}\n")
+
+        while True:
+            decisao_concluir = input("Deseja concluir esta tarefa (S/N)? ").strip().lower()
+
+            if decisao_concluir == 's':
+                try:
+                    self._gerenciador.concluir(tarefa)
+
+                except ValueError as erro:
+                    print(f"\nNão foi possível concluir esta tarefa: {erro}")
+                    self.pausar()
+                    return
+
+                print("\nTarefa concluída com sucesso!")
+                self.pausar()
+                return
+
+            elif decisao_concluir == 'n':
+                return
+            else:
+                print("\nResposta inválida.")
+
+    def _excluir_tarefa(self, tarefa: Tarefa):
+        self.limpar_tela()
+
+        print("\n========== EXCLUIR TAREFA ==========")
+        print(f"\nTarefa: {tarefa.titulo}")
+
+        while True:
+            decisao_excluir = input("Deseja concluir esta tarefa (S/N)? ").strip().lower()
+
+            if decisao_excluir == 's':
+                try:
+                    self._gerenciador.excluir(tarefa)
+
+                except ValueError as erro:
+                    print(f"\nNão foi possível excluir esta tarefa: {erro}")
+                    self.pausar()
+                    return False
+
+                print("\nTarefa excluída com sucesso!")
+                self.pausar()
+                return True
+
+            elif decisao_excluir == 'n':
+                return False
+
+            else:
+                print("\nResposta inválida.")
 
     def sair(self):
         print("\nEncerrando o aplicativo...")
