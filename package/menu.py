@@ -16,7 +16,7 @@ class Menu:
         self._repositorio = repositorio
 
 
-        # Menu pythônico em forma de dicionário
+        # Menu pythônico em ma de dicionário
         # O número que o usuário digitar é justamente a chave que acessa os métodos
         self._opcoes = {
                 "1": self.criar_tarefa, # Referência ao método criar_tarefa
@@ -363,12 +363,14 @@ class Menu:
             "2": self._alterar_descricao,
             "3": self._alterar_prioridade,
             "4": self._alterar_vencimento,
-            "6": self._concluir_tarefa,
-            "7": self._excluir_tarefa,
+            "8": self._concluir_tarefa,
+            "9": self._excluir_tarefa,
         }
 
         if isinstance(tarefa, TarefaChecklist):
             submenu_editar["5"] = self._gerenciar_checklist
+            submenu_editar["6"] = self._adicionar_item_checklist
+            submenu_editar["7"] = self._desmarcar_item_checklist
 
         while True:
 
@@ -381,14 +383,16 @@ class Menu:
             print("4. Alterar vencimento")
             if isinstance(tarefa, TarefaChecklist):
                 print("5. Gerenciar checklist")
-            print("6. Concluir tarefa")
-            print("7. Excluir tarefa")
-            print("8. Voltar\n")
+                print("6. Adicionar item ao checklist")
+                print("7. Desmarcar item do checklist")
+            print("8. Concluir tarefa")
+            print("9. Excluir tarefa")
+            print("10. Voltar\n")
             print("=" * 34)
 
             opcao_editar = input("O que deseja fazer? ").strip()
 
-            if opcao_editar == "8":
+            if opcao_editar == "10":
                 break
 
             acao_editar = submenu_editar.get(opcao_editar)
@@ -400,7 +404,7 @@ class Menu:
 
             resultado = acao_editar(tarefa)
 
-            if opcao_editar == "7" and resultado is True:
+            if opcao_editar == "9" and resultado is True:
                 break
 
     def _alterar_titulo(self, tarefa: Tarefa):
@@ -506,6 +510,11 @@ class Menu:
             self.pausar()
             return
 
+        if tarefa.concluida:
+            print("\nReabra a tarefa antes de modificar os itens!")
+            self.pausar()
+            return
+
         self.limpar_tela()
 
         print("\n========== GERENCIAR CHECKLIST ==========")
@@ -551,6 +560,93 @@ class Menu:
         print("\nItem marcado com sucesso!")
         self.pausar()
 
+    def _adicionar_item_checklist(self, tarefa: TarefaChecklist):
+
+        if tarefa.concluida:
+            print("\nReabra a tarefa antes de modificar os itens!")
+            self.pausar()
+            return
+
+        self.limpar_tela()
+
+        print("\n========== ADICIONAR ITEM ==========")
+        print(f"\nTarefa: {tarefa.titulo}")
+
+        while True:
+            novo_item = input("\nDigite o novo item (0 para voltar): ").strip()
+
+            if novo_item == "0":
+                return
+
+            if not novo_item:
+                print("\nO item não pode estar vazio!")
+                continue
+
+            try:
+                tarefa.adicionar_item(novo_item)
+            except ValueError as erro:
+                print(f"\nNão foi possível adicionar o item: {erro}")
+                self.pausar()
+                return
+
+            print("\nItem adicionado com sucesso!")
+            self.pausar()
+            return
+
+    def _desmarcar_item_checklist(self, tarefa: TarefaChecklist):
+
+        if tarefa.concluida:
+            print("\nReabra a tarefa antes de modificar os itens!")
+            self.pausar()
+            return
+
+        self.limpar_tela()
+
+        print("\n========== DESMARCAR ITEM ==========")
+        print(f"\nTarefa: {tarefa.titulo}")
+
+        itens = tarefa.itens
+
+        if not itens:
+            print("\nEste checklist não possui itens!")
+            self.pausar()
+            return
+
+        for numero, item in enumerate(itens, start=1):
+            status = "[x]" if item.feito else "[ ]"
+            print(f"{numero}. {status} {item.texto}")
+
+        while True:
+            try:
+                numero_item = int(input("\nDigite o número do item (0 para voltar): "))
+            except ValueError:
+                print("\nInforme um número inteiro válido!")
+                continue
+
+            if numero_item == 0:
+                return
+
+            if numero_item < 1 or numero_item > len(itens):
+                print("\nEsse item não existe!")
+                continue
+
+            item_selecionado = itens[numero_item - 1]
+
+            if not item_selecionado.feito:
+                print("\nEsse item já está desmarcado!")
+                continue
+
+            try:
+                item_selecionado.desmarcar()
+            except ValueError as erro:
+                print(f"\nNão foi possível desmarcar o item: {erro}")
+                self.pausar()
+                return
+
+            print("\nItem desmarcado com sucesso!")
+            self.pausar()
+            return
+
     def _concluir_tarefa(self, tarefa: Tarefa):
         self.limpar_tela()
 
@@ -591,7 +687,7 @@ class Menu:
         print(f"\nTarefa: {tarefa.titulo}")
 
         while True:
-            decisao_excluir = input("Deseja concluir esta tarefa (S/N)? ").strip().lower()
+            decisao_excluir = input("Deseja realmente excluir esta tarefa (S/N)? ").strip().lower()
 
             if decisao_excluir == 's':
                 try:
