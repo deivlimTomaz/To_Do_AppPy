@@ -668,12 +668,42 @@ class Menu:
             self.pausar()
             return
 
+        proxima_data = tarefa.recorrencia.proxima_data(tarefa.data_vencimento)
+
+        # Verifica se já existe uma tarefa recorrente semelhante na data calculada.
+        # A coincidência gera um aviso, mas não impede a criação.
+        ocorrencia_existente = any(
+        isinstance(t, TarefaRecorr)
+        and t.id != tarefa.id
+        and t.titulo == tarefa.titulo
+        and t.data_vencimento == proxima_data
+        and t.recorrencia.frequencia == tarefa.recorrencia.frequencia
+        and t.recorrencia.intervalo == tarefa.recorrencia.intervalo
+        for t in self._gerenciador.lista.tarefas
+        )
+
         while True:
 
             decisao_recorr = input("\nGerar próxima recorrência (S/N)? ").strip().lower()
 
             if decisao_recorr == 's':
                 try:
+                    if ocorrencia_existente:
+                        confirmacao = input(
+                            "\nJá existe uma ocorrência semelhante para essa data. "
+                            "Deseja criar outra mesmo assim (S/N)? "
+                        ).strip().lower()
+
+                        if confirmacao == 's':
+                            break
+
+                        if confirmacao == 'n':
+                            print("\nGeração cancelada.")
+                            self.pausar()
+                            return
+
+                        print("\nResposta inválida! Digite S ou N")
+
                     novo_id = self._gerenciador.gerar_id()
                     nova_tarefa = tarefa.gerar_proxima(novo_id)
                     self._gerenciador.criar(nova_tarefa)
