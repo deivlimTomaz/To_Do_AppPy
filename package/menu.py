@@ -363,14 +363,17 @@ class Menu:
             "2": self._alterar_descricao,
             "3": self._alterar_prioridade,
             "4": self._alterar_vencimento,
-            "8": self._concluir_tarefa,
-            "9": self._excluir_tarefa,
+            "9": self._concluir_tarefa,
+            "10": self._excluir_tarefa,
         }
 
         if isinstance(tarefa, TarefaChecklist):
             submenu_editar["5"] = self._gerenciar_checklist
             submenu_editar["6"] = self._adicionar_item_checklist
             submenu_editar["7"] = self._desmarcar_item_checklist
+
+        if isinstance(tarefa, TarefaRecorr):
+            submenu_editar["8"] = self._gerar_proxima_recorrencia
 
         while True:
 
@@ -385,14 +388,16 @@ class Menu:
                 print("5. Gerenciar checklist")
                 print("6. Adicionar item ao checklist")
                 print("7. Desmarcar item do checklist")
-            print("8. Concluir tarefa")
-            print("9. Excluir tarefa")
-            print("10. Voltar\n")
+            if isinstance(tarefa, TarefaRecorr):
+                print("8. Gerar próxima ocorrência da tarefa")
+            print("9. Concluir tarefa")
+            print("10. Excluir tarefa")
+            print("11. Voltar\n")
             print("=" * 34)
 
             opcao_editar = input("O que deseja fazer? ").strip()
 
-            if opcao_editar == "10":
+            if opcao_editar == "11":
                 break
 
             acao_editar = submenu_editar.get(opcao_editar)
@@ -404,7 +409,7 @@ class Menu:
 
             resultado = acao_editar(tarefa)
 
-            if opcao_editar == "9" and resultado is True:
+            if opcao_editar == "10" and resultado is True:
                 break
 
     def _alterar_titulo(self, tarefa: Tarefa):
@@ -646,6 +651,47 @@ class Menu:
             print("\nItem desmarcado com sucesso!")
             self.pausar()
             return
+
+    def _gerar_proxima_recorrencia(self, tarefa: TarefaRecorr):
+
+        self.limpar_tela()
+
+        print("\n========== GERAR PRÓXIMA RECORRÊNCIA ==========")
+        print(f"\nTarefa: {tarefa.titulo}")
+        print(f"\nFrequência: {tarefa.recorrencia.frequencia.capitalize()}")
+        print(f"\nStatus: {'Concluída' if tarefa.concluida else 'Pendente'}\n")
+
+        if not tarefa.concluida:
+            print("\nConclua a tarefa antes de gerar a próxima ocorrência")
+            self.pausar()
+            return
+
+        while True:
+
+            decisao_recorr = input("\nGerar próxima recorrência (S/N)? ").strip().lower()
+
+            if decisao_recorr == 's':
+                try:
+                    novo_id = self._gerenciador.gerar_id()
+                    nova_tarefa = tarefa.gerar_proxima(novo_id)
+                    self._gerenciador.criar(nova_tarefa)
+
+                except ValueError as erro:
+                    print(f"\nNão foi possível gerar a ocorrência: {erro}")
+                    self.pausar()
+                    return
+
+                print("\nNova ocorrência criada com sucesso!")
+                print(f"\nNovo ID: {nova_tarefa.id}")
+                print(f"\nNovo vencimento: " f"{nova_tarefa.data_vencimento.strftime('%d/%m/%Y')}")
+
+                self.pausar()
+                return
+
+            elif decisao_recorr == 'n':
+                return
+            else:
+                print("Digite S ou N.")
 
     def _concluir_tarefa(self, tarefa: Tarefa):
         self.limpar_tela()
