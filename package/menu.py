@@ -364,7 +364,8 @@ class Menu:
             "3": self._alterar_prioridade,
             "4": self._alterar_vencimento,
             "9": self._concluir_tarefa,
-            "10": self._excluir_tarefa,
+            "10": self.reabrir_tarefa,
+            "11": self._excluir_tarefa,
         }
 
         if isinstance(tarefa, TarefaChecklist):
@@ -391,13 +392,14 @@ class Menu:
             if isinstance(tarefa, TarefaRecorr):
                 print("8. Gerar próxima ocorrência da tarefa")
             print("9. Concluir tarefa")
-            print("10. Excluir tarefa")
-            print("11. Voltar\n")
+            print("10. Reabrir tarefa")
+            print("11. Excluir tarefa")
+            print("12. Voltar\n")
             print("=" * 34)
 
             opcao_editar = input("O que deseja fazer? ").strip()
 
-            if opcao_editar == "11":
+            if opcao_editar == "12": # Voltar quebra o loop direto
                 break
 
             acao_editar = submenu_editar.get(opcao_editar)
@@ -409,7 +411,7 @@ class Menu:
 
             resultado = acao_editar(tarefa)
 
-            if opcao_editar == "10" and resultado is True:
+            if opcao_editar == "11" and resultado is True: # Excluir volta direto pro Menu
                 break
 
     def _alterar_titulo(self, tarefa: Tarefa):
@@ -722,6 +724,41 @@ class Menu:
                 return
 
             elif decisao_concluir == 'n':
+                return
+            else:
+                print("\nResposta inválida.")
+
+    def reabrir_tarefa(self, tarefa: Tarefa):
+
+        self.limpar_tela()
+
+        if not tarefa.concluida:
+            print("\nEsta tarefa já está pendente!")
+            self.pausar()
+            return
+
+        print("\n========== REABRIR TAREFA ==========")
+        print(f"\nTarefa: {tarefa.titulo}")
+        print(f"\nStatus atual: {'Concluída' if tarefa.concluida else 'Pendente'}")
+
+        while True:
+
+            decisao_reabrir = input("\nDeseja reabrir esta tarefa (S/N)? ").strip().lower()
+
+            if decisao_reabrir == 's':
+                try:
+                    tarefa.reabrir()
+
+                except ValueError as erro:
+                    print(f"\nNão foi possível reabrir esta tarefa: {erro}")
+                    self.pausar()
+                    return
+
+                print("\nTarefa reaberta com sucesso!")
+                self.pausar()
+                return
+
+            elif decisao_reabrir == 'n':
                 return
             else:
                 print("\nResposta inválida.")
