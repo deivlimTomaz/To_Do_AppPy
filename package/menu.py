@@ -22,7 +22,7 @@ class Menu:
                 "1": self.criar_tarefa, # Referência ao método criar_tarefa
                 "2": self.listar_tarefas, # Referência ao método listar_tarefas
                 "3": self.editar_tarefa,
-                "5": self.sair # Referência ao método sair
+                "4": self.sair # Referência ao método sair
         }
 
         self._executando = True
@@ -37,7 +37,7 @@ class Menu:
             print("1. Criar tarefa")
             print("2. Listar tarefas")
             print("3. Editar tarefa")
-            print("5. Sair")
+            print("4. Sair")
             print("=" * 31)
 
             opcao = input("Escolha uma opção: ").strip()
