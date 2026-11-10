@@ -1,7 +1,6 @@
-from package.repositorio import Repositorio
 import json
 
-class RepositorioJson(Repositorio):
+class RepositorioJson():
 
     def __init__(self, caminho_arq: str):
         
