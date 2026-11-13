@@ -4,7 +4,7 @@ from datetime import date
 
 class Tarefa(ABC):
 
-    def __init__(self, id: int, titulo: str, descricao: str, prioridade: Prioridade, data_vencimento: date):
+    def __init__(self, id: int | None, titulo: str, descricao: str, prioridade: Prioridade, data_vencimento: date):
 
         if not isinstance(prioridade, Prioridade):
             raise TypeError("Forneça uma prioridade válida!")
@@ -23,11 +23,12 @@ class Tarefa(ABC):
         if not isinstance(data_vencimento, date):
             raise TypeError("Forneça a data no formato correto.")
 
-        if not isinstance(id, int) or isinstance(id, bool):
-            raise TypeError("O ID deve ser um número inteiro!")
+        if id is not None:
+            if not isinstance(id, int) or isinstance(id, bool):
+                raise TypeError("O ID deve ser um número inteiro!")
 
-        if id <= 0:
-            raise ValueError("O ID deve ser maior que zero!")
+            if id <= 0:
+                raise ValueError("O ID deve ser maior que zero!")
 
         self._id = id
         self._prioridade = prioridade
@@ -84,6 +85,18 @@ class Tarefa(ABC):
 
         return dados_dict
 
+    def atribuir_id(self, novo_id: int) -> None:
+        if self._id is not None:
+            raise ValueError("A tarefa já possui um ID.")
+
+        if not isinstance(novo_id, int) or isinstance(novo_id, bool):
+            raise TypeError("O ID deve ser um inteiro!")
+
+        if novo_id <= 0:
+            raise ValueError("O ID deve ser positivo!")
+
+        self._id = novo_id
+
     @property
     def titulo(self) -> str:
         return self._titulo
@@ -97,7 +110,7 @@ class Tarefa(ABC):
         return self._concluida
 
     @property
-    def id(self) -> int:
+    def id(self) -> int | None:
         return self._id
 
     @property
