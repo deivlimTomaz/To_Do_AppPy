@@ -123,7 +123,72 @@ class RepositorioSQLite(Repositorio):
 
 
     def atualizar(self, tarefa: Tarefa) -> None:
-        raise NotImplementedError
 
+        if not isinstance(tarefa, TarefaSimples):
+            raise TypeError("A tarefa não é uma instância de TarefaSimples")
+
+        if tarefa.id is None:
+            raise ValueError("O ID da tarefa não existe")
+
+        
+        conexao = conectar(self._caminho_db)
+
+        try:
+            cursor = conexao.cursor()
+
+            dados = (
+                tarefa.titulo,
+                tarefa.descricao,
+                tarefa.prioridade.name,
+                tarefa.data_vencimento.isoformat(),
+                int(tarefa.concluida),
+                tarefa.id
+            )
+
+            sql = """
+                UPDATE tarefas
+                SET titulo = ?,
+                    descricao = ?,
+                    prioridade = ?,
+                    data_vencimento = ?,
+                    concluida = ?
+                WHERE id = ?;"""
+            
+            cursor.execute(sql, dados)
+
+            if cursor.rowcount == 0:
+                raise ValueError("Tarefa não foi encontrada")
+
+            conexao.commit() # Em caso de sucesso, atualiza todos os dados.
+
+        except Exception:
+            conexao.rollback() # Desfaz todas as modificações feitas em caso de erro
+            raise
+
+        finally:
+            conexao.close()
+
+            
     def remover(self, id: int) -> None:
-        raise NotImplementedError
+
+        if not isinstance(id, int) or isinstance(id, bool):
+            raise TypeError("O ID deve ser um inteiro")
+
+        conexao = conectar(self._caminho_db)
+
+        try:
+            cursor = conexao.cursor()
+
+            cursor.execute("DELETE FROM tarefas WHERE id = ?;", (id,))
+
+            if cursor.rowcount == 0:
+                raise ValueError("Tarefa não foi encontrada")
+
+            conexao.commit()
+
+        except Exception:
+            conexao.rollback()
+            raise
+
+        finally:
+            conexao.close()
