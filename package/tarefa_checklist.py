@@ -2,6 +2,7 @@ from package.tarefa import Tarefa
 from package.item_checklist import ItemChecklist
 from package.prioridade import Prioridade
 from datetime import date
+import copy
 
 class TarefaChecklist(Tarefa):
 
@@ -12,7 +13,7 @@ class TarefaChecklist(Tarefa):
 
     @property
     def itens(self):
-        return self._itens[:] # Cópia rasa da lista para impedir que modificações externas alterem o estado original.
+        return copy.deepcopy(self._itens) # Cópia rasa da lista para impedir que modificações externas alterem o estado original.
 
     def adicionar_item(self, nome: str):
 
@@ -28,8 +29,8 @@ class TarefaChecklist(Tarefa):
 
     def _validar_indice(self, indice):
 
-        if not isinstance(indice, int):
-            raise TypeError("O índice deve ser um número!")
+        if not isinstance(indice, int) or isinstance(indice, bool):
+            raise TypeError("O índice deve ser um inteiro!")
 
         if indice >= len(self._itens) or indice <= -1:
             raise IndexError("Não há essa quantidade de itens na sua tarefa!")

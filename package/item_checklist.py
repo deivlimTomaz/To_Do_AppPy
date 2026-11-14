@@ -2,6 +2,9 @@ class ItemChecklist:
 
     def __init__(self, texto: str):
 
+        if not isinstance(texto, str):
+            raise TypeError("O titulo do item deve ser uma string!")
+
         self._feito = False
         self._texto = texto
 
