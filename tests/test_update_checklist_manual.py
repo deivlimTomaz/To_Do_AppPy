@@ -70,3 +70,23 @@ with TemporaryDirectory() as pasta:
     assert all(item.feito for item in recuperada.itens)
 
     print("TESTE conclusão: APROVADO!")
+
+    # TESTE: ATUALIZAÇÃO COM CHECKLIST VAZIO
+
+    tarefa_vazia = TarefaChecklist(
+        None,
+        "Checklist vazio",
+        "Verificar atualização sem itens",
+        Prioridade.BAIXA,
+        date(2026, 11, 20)
+    )
+
+    repositorio.adicionar(tarefa_vazia)
+    repositorio.atualizar(tarefa_vazia)
+
+    recuperada = repositorio.buscar_por_id(tarefa_vazia.id)
+
+    assert isinstance(recuperada, TarefaChecklist)
+    assert recuperada.itens == []
+
+    print("TESTE checklist vazio: APROVADO!")
