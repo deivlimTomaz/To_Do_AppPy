@@ -12,7 +12,7 @@ class TarefaRecorr(Tarefa):
 
         self._recorrencia = recorr
 
-    def gerar_proxima(self, novo_id):
+    def gerar_proxima(self):
         frequencia = self._recorrencia.frequencia
         intervalo = self._recorrencia.intervalo
 
@@ -29,7 +29,7 @@ class TarefaRecorr(Tarefa):
 
         nova_recorrencia = Recorrencia(frequencia, intervalo)
 
-        proxima_tarefa = TarefaRecorr(novo_id, self._titulo, self._descricao, self._prioridade, calc_prox_data, nova_recorrencia)
+        proxima_tarefa = TarefaRecorr(None, self._titulo, self._descricao, self._prioridade, calc_prox_data, nova_recorrencia)
 
         return proxima_tarefa
 

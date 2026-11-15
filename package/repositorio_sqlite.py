@@ -4,6 +4,7 @@ from package.repositorio import Repositorio
 from package.tarefa import Tarefa
 from package.tarefa_checklist import TarefaChecklist
 from package.item_checklist import ItemChecklist
+from package.tarefa_recorr import TarefaRecorr
 from package.tarefa_simples import TarefaSimples
 from package.conexao import conectar
 from package.prioridade import Prioridade
@@ -15,7 +16,7 @@ class RepositorioSQLite(Repositorio):
 
     def adicionar(self, tarefa: Tarefa) -> Tarefa:
 
-        if not isinstance(tarefa, (TarefaSimples, TarefaChecklist)):
+        if not isinstance(tarefa, (TarefaSimples, TarefaChecklist, TarefaRecorr)):
             raise TypeError("Tipo de tarefa ainda não suportado.")
 
         if tarefa.id is not None:
@@ -72,6 +73,24 @@ class RepositorioSQLite(Repositorio):
                     ) 
 
                     conexao.execute(sql_checklist, dados_item)
+
+            if isinstance (tarefa, TarefaRecorr):
+
+                dados_recorrencia = (
+                        novo_id,
+                        tarefa.recorrencia.frequencia,
+                        tarefa.recorrencia.intervalo
+                        )
+
+
+                sql_recorrencias = """INSERT INTO recorrencias (
+                                        tarefa_id,
+                                        frequencia,
+                                        intervalo
+                                    )
+                                    VALUES (?, ?, ?);"""
+
+                conexao.execute(sql_recorrencias, dados_recorrencia)
 
             conexao.commit()
             tarefa.atribuir_id(novo_id)
@@ -145,6 +164,34 @@ class RepositorioSQLite(Repositorio):
 
                 return TarefaChecklist.de_dict(dados)
 
+            if linha[1] == "TarefaRecorr":
+                consulta_recorr = """SELECT frequencia, intervalo
+                                     FROM recorrencias
+                                     WHERE tarefa_id = ?;"""
+
+                cursor.execute(consulta_recorr, (id,))
+
+                linha_recorr = cursor.fetchone()
+
+                if linha_recorr is None:
+                    raise ValueError("Uma tarefa recorrente precisa possuir suas configurações específicas.")
+
+                dados = {
+                    "id": linha[0],
+                    "tipo": linha[1],
+                    "titulo": linha[2],
+                    "descricao": linha[3],
+                    "prioridade": linha[4],
+                    "data_vencimento": linha[5],
+                    "concluida": bool(linha[6]),
+                    "recorrencia": {
+                        "frequencia": linha_recorr[0],
+                        "intervalo": linha_recorr[1]
+                    }
+                }
+
+                return TarefaRecorr.de_dict(dados)
+
             raise NotImplementedError(f"Reconstrução não implementada para o tipo: {linha[1]}")
         
         finally:
@@ -180,8 +227,8 @@ class RepositorioSQLite(Repositorio):
 
     def atualizar(self, tarefa: Tarefa) -> None:
 
-        if not isinstance(tarefa, (TarefaSimples, TarefaChecklist)):
-            raise TypeError("Tipo de tarefa ainda não suportado")
+        if not isinstance(tarefa, (TarefaSimples, TarefaChecklist, TarefaRecorr)):
+            raise TypeError("Tipo de tarefa não suportado")
 
         if tarefa.id is None:
             raise ValueError("O ID da tarefa não existe")
@@ -242,6 +289,23 @@ class RepositorioSQLite(Repositorio):
 
                     cursor.execute(inserir_itens_atuais, dados_item)
 
+            if isinstance(tarefa, TarefaRecorr):
+                update_recorr = """
+                    UPDATE recorrencias
+                    SET frequencia = ?,
+                        intervalo = ?
+                    WHERE tarefa_id = ?;"""
+
+                dados_recorrencia = (
+                    tarefa.recorrencia.frequencia,
+                    tarefa.recorrencia.intervalo,
+                    tarefa.id
+                )
+
+                cursor.execute(update_recorr, dados_recorrencia)
+
+                if cursor.rowcount == 0:
+                    raise ValueError("Configuração de recorrência não encontrada")
 
             conexao.commit() # Em caso de sucesso, atualiza todos os dados.
 
