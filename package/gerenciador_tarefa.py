@@ -1,5 +1,6 @@
 from package.repositorio import Repositorio
 from package.tarefa import Tarefa
+from package.tarefa_recorr import TarefaRecorr
 from package.prioridade import Prioridade
 from package.tarefa_checklist import TarefaChecklist
 from datetime import date
@@ -139,3 +140,16 @@ class GerenciadorTarefa:
         self._repositorio.atualizar(tarefa)
 
         return tarefa
+
+    def gerar_proxima_recorrencia(self, id_tarefa: int) -> TarefaRecorr:
+        tarefa = self.buscar_por_id(id_tarefa)
+
+        if not isinstance(tarefa, TarefaRecorr):
+            raise TypeError("A tarefa não é do tipo recorrente")
+
+        if not tarefa.concluida:
+            raise ValueError("A tarefa não está concluída ainda.")
+
+        proxima = tarefa.gerar_proxima()
+
+        return self.criar(proxima)
