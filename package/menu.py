@@ -151,9 +151,8 @@ class Menu:
     def _criar_simples(self):
 
         dados_comuns = self._coletar_dados_comuns() # Chamar método de solicitação de dados
-        tarefa_id = self._gerenciador.gerar_id() # Gerenciador de tarefas cria um id para determinada tarefa
+        tarefa_simples = TarefaSimples(None, **dados_comuns)
 
-        tarefa_simples = TarefaSimples(tarefa_id, **dados_comuns) # Tarefa recebe as características completas de uma tarefa simples + seu id + dados comuns
         self._gerenciador.criar(tarefa_simples) # Gerenciador cadastra essa tarefa no sistema
 
         print("\nTarefa simples criada com sucesso!")
@@ -162,9 +161,7 @@ class Menu:
     def _criar_checklist(self):
 
         dados_comuns = self._coletar_dados_comuns()
-        tarefa_id = self._gerenciador.gerar_id()
-
-        tarefa_checklist = TarefaChecklist(tarefa_id, **dados_comuns)
+        tarefa_checklist = TarefaChecklist(None, **dados_comuns)
 
         while True:
             add_item = input("\nDeseja adicionar um item? (S/N): ").strip().lower()
@@ -242,9 +239,7 @@ class Menu:
         # Construção da recorrência
         recorr = Recorrencia(frequencia, intervalo)
 
-        tarefa_id = self._gerenciador.gerar_id()
-
-        tarefa_recorr = TarefaRecorr(tarefa_id, **dados_comuns, recorr=recorr)
+        tarefa_recorr = TarefaRecorr(None, **dados_comuns, recorr=recorr)
 
         # Cadastro
         self._gerenciador.criar(tarefa_recorr)
@@ -273,7 +268,7 @@ class Menu:
 
     def listar_tarefas(self):
 
-        tarefas = self._gerenciador.lista.tarefas
+        tarefas = self._gerenciador.listar()
 
         if not tarefas:
             print("\nNenhuma tarefa cadastrada!")
@@ -308,7 +303,7 @@ class Menu:
             self.pausar()
 
     def _listar_tarefas_resumidas(self):
-        tarefas = self._gerenciador.lista.tarefas
+        tarefas = self._gerenciador.listar()
 
         self.limpar_tela()
 
@@ -320,7 +315,7 @@ class Menu:
         print("-" * 35)
 
     def editar_tarefa(self):
-        tarefas = self._gerenciador.lista.tarefas
+        tarefas = self._gerenciador.listar()
 
         if not tarefas:
             print("\nNenhuma tarefa cadastrada!")
@@ -413,6 +408,9 @@ class Menu:
 
             if opcao_editar == "11" and resultado is True: # Excluir volta direto pro Menu
                 break
+
+            # Recuperação do estado atualizado após cada operação.
+            tarefa = self._gerenciador.buscar_por_id(tarefa.id)
 
     def _alterar_titulo(self, tarefa: Tarefa):
 
@@ -557,7 +555,7 @@ class Menu:
         indice = numero_item - 1
 
         try:
-            tarefa.marcar_item(indice)
+            self._gerenciador.marcar_item(tarefa.id, indice)
 
         except ValueError as erro:
             print(f"\nNão foi possível marcar o item: {erro}")
@@ -590,7 +588,7 @@ class Menu:
                 continue
 
             try:
-                tarefa.adicionar_item(novo_item)
+                self._gerenciador.adicionar_item(tarefa.id, novo_item)
             except ValueError as erro:
                 print(f"\nNão foi possível adicionar o item: {erro}")
                 self.pausar()
@@ -644,7 +642,7 @@ class Menu:
                 continue
 
             try:
-                item_selecionado.desmarcar()
+                self._gerenciador.desmarcar_item(tarefa.id, numero_item - 1)
             except ValueError as erro:
                 print(f"\nNão foi possível desmarcar o item: {erro}")
                 self.pausar()
@@ -679,7 +677,7 @@ class Menu:
         and t.data_vencimento == proxima_data
         and t.recorrencia.frequencia == tarefa.recorrencia.frequencia
         and t.recorrencia.intervalo == tarefa.recorrencia.intervalo
-        for t in self._gerenciador.lista.tarefas
+        for t in self._gerenciador.listar()
         )
 
         while True:
@@ -704,9 +702,7 @@ class Menu:
 
                         print("\nResposta inválida! Digite S ou N")
 
-                    novo_id = self._gerenciador.gerar_id()
-                    nova_tarefa = tarefa.gerar_proxima(novo_id)
-                    self._gerenciador.criar(nova_tarefa)
+                    nova_tarefa = self._gerenciador.gerar_proxima_recorrencia(tarefa.id)
 
                 except ValueError as erro:
                     print(f"\nNão foi possível gerar a ocorrência: {erro}")
@@ -777,7 +773,7 @@ class Menu:
 
             if decisao_reabrir == 's':
                 try:
-                    tarefa.reabrir()
+                    self._gerenciador.reabrir(tarefa)
 
                 except ValueError as erro:
                     print(f"\nNão foi possível reabrir esta tarefa: {erro}")
