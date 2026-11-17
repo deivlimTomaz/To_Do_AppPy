@@ -4,6 +4,8 @@ from package.tarefa_recorr import TarefaRecorr
 from package.prioridade import Prioridade
 from package.tarefa_checklist import TarefaChecklist
 from datetime import date
+from package.repositorio_json import RepositorioJson
+from package.fabrica_tarefa import tarefa_de_dict
 
 class GerenciadorTarefa:
 
@@ -153,3 +155,37 @@ class GerenciadorTarefa:
         proxima = tarefa.gerar_proxima()
 
         return self.criar(proxima)
+
+    def exportar_json(self, caminho: str) -> None:
+        repositorio_json = RepositorioJson(caminho)
+
+        tarefas = self._repositorio.listar()
+
+        dados = [tarefa.para_dict() for tarefa in tarefas]
+
+        repositorio_json.salvar(dados)
+
+    def importar_json(self, caminho: str) -> int:
+        repositorio_json = RepositorioJson(caminho)
+
+        dados = repositorio_json.carregar()
+
+        if not isinstance(dados, list):
+            raise ValueError("O JSON deve conter uma lista de tarefas.")
+
+        tarefas = []
+
+        for dados_tarefa in dados:
+            if not isinstance(dados_tarefa, dict):
+                raise ValueError("Cada tarefa deve ser um dicionário.")
+
+            dados_novos = dados_tarefa.copy()
+            dados_novos["id"] = None
+
+            tarefa = tarefa_de_dict(dados_novos)
+            tarefas.append(tarefa)
+
+        for tarefa in tarefas:
+            self.criar(tarefa)
+
+        return len(tarefas)
