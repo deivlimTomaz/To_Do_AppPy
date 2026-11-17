@@ -76,6 +76,16 @@ with TemporaryDirectory() as pasta:
 
     print("TESTE concluir(): APROVADO!")
 
+    # TESTE: REABRIR TAREFA
+
+    gerenciador.reabrir(tarefa)
+
+    recuperada = gerenciador.buscar_por_id(tarefa.id)
+
+    assert recuperada.concluida is False
+
+    print("TESTE reabrir(): APROVADO!")
+
     # TESTE 6: Excluir
     gerenciador.excluir(tarefa)
 

@@ -1,6 +1,7 @@
 from package.repositorio import Repositorio
 from package.tarefa import Tarefa
 from package.prioridade import Prioridade
+from package.tarefa_checklist import TarefaChecklist
 from datetime import date
 
 class GerenciadorTarefa:
@@ -78,3 +79,63 @@ class GerenciadorTarefa:
 
     def listar(self) -> list[Tarefa]:
         return self._repositorio.listar()
+
+    def reabrir(self, tarefa_procurada: Tarefa):
+        if not isinstance(tarefa_procurada, Tarefa):
+            raise TypeError("O objeto não é uma tarefa!")
+
+        tarefa = self.buscar_por_id(tarefa_procurada.id)
+
+        tarefa.reabrir()
+
+        self._repositorio.atualizar(tarefa)
+
+        return tarefa
+
+    def adicionar_item(self, id_tarefa: int, texto: str) -> TarefaChecklist:
+        tarefa = self.buscar_por_id(id_tarefa)
+
+        if not isinstance(tarefa, TarefaChecklist):
+            raise TypeError("A tarefa não é do tipo checklist")
+
+        tarefa.adicionar_item(texto)
+
+        self._repositorio.atualizar(tarefa)
+
+        return tarefa
+
+    def remover_item(self, id_tarefa: int, indice: int) -> TarefaChecklist:
+        tarefa = self.buscar_por_id(id_tarefa)
+
+        if not isinstance(tarefa, TarefaChecklist):
+            raise TypeError("A tarefa não é do tipo checklist")
+
+        tarefa.remover_item(indice)
+
+        self._repositorio.atualizar(tarefa)
+
+        return tarefa
+
+    def marcar_item(self, id_tarefa: int, indice: int) -> TarefaChecklist:
+        tarefa = self.buscar_por_id(id_tarefa)
+
+        if not isinstance(tarefa, TarefaChecklist):
+            raise TypeError("A tarefa não é do tipo checklist")
+
+        tarefa.marcar_item(indice)
+
+        self._repositorio.atualizar(tarefa)
+
+        return tarefa
+
+    def desmarcar_item(self, id_tarefa: int, indice: int) -> TarefaChecklist:
+        tarefa = self.buscar_por_id(id_tarefa)
+
+        if not isinstance(tarefa, TarefaChecklist):
+            raise TypeError("A tarefa não é do tipo checklist")
+
+        tarefa.desmarcar_item(indice)
+
+        self._repositorio.atualizar(tarefa)
+
+        return tarefa

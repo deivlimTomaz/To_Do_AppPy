@@ -13,9 +13,11 @@ class TarefaChecklist(Tarefa):
 
     @property
     def itens(self):
-        return copy.deepcopy(self._itens) # Cópia rasa da lista para impedir que modificações externas alterem o estado original.
-
+        return copy.deepcopy(self._itens) # Cópia da lista
     def adicionar_item(self, nome: str):
+
+        if not isinstance(nome, str):
+            raise TypeError("O nome do item deve ser uma string.")
 
         if not nome.strip():
             raise ValueError("O nome do item não pode estar vazio!")
