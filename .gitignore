@@ -12,3 +12,9 @@ venv/
 
 # Arquivos temporários
 *.log
+
+# Banco de dados SQLite
+tarefas.db
+*.db-journal
+*.db-wal
+*.db-shm
