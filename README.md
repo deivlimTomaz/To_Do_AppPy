@@ -1,128 +1,214 @@
-# Gerenciador de Tarefas — To-Do App em Python
 
-Projeto acadêmico de **Programação Orientada a Objetos (POO)** desenvolvido em Python. O objetivo é construir um gerenciador de tarefas evolutivo, começando pela modelagem das classes e chegando a um menu interativo, persistência em banco de dados e interface gráfica.
+# To-Do App Python
 
-> **Estado atual:** núcleo de classes e demonstração funcional do Nível 1. O menu principal, a interface gráfica e outras funcionalidades planejadas ainda não fazem parte da demonstração atual.
+Aplicação de gerenciamento de tarefas desenvolvida em **Python**, utilizando conceitos de Programação Orientada a Objetos (POO), persistência com **SQLite** e serialização de objetos em **JSON**.
 
-## Funcionalidades implementadas e demonstradas
+O sistema funciona pelo terminal e permite organizar tarefas com diferentes comportamentos e prioridades.
 
-- Criação e organização de tarefas em **listas** associadas a **categorias**.
-- **Tarefa simples:** cadastro e conclusão.
-- **Tarefa checklist:** adição e marcação de itens; conclusão condicionada à finalização de todos os itens.
-- **Tarefa recorrente:** frequências diária, semanal, mensal e anual, com intervalo configurável; geração de nova ocorrência após a conclusão da anterior.
-- **Gerenciamento:** cadastro, edição, conclusão, exclusão e filtragem de tarefas por prioridade.
-- **Prioridades:** baixa, média e alta.
-- **Serialização:** representação de tarefas em dicionários; há classes com suporte a reconstrução a partir desses dados.
-- **Persistência em JSON:** implementação de repositório para salvar e carregar dados, ainda não integrada a um fluxo completo de menu.
+## Funcionalidades
 
-## Conceitos de POO utilizados
+- Criar, listar, editar e excluir tarefas.
+- Concluir e reabrir tarefas.
+- Filtrar tarefas por prioridade: baixa, média e alta.
+- Gerenciar tarefas simples, checklists e recorrências.
+- Armazenar tarefas em um banco SQLite.
+- Preservar os dados após encerrar o aplicativo.
+- Serializar e desserializar objetos em JSON.
 
-| Conceito | Aplicação no projeto |
-| --- | --- |
-| **Abstração** | `Tarefa` define a estrutura comum às tarefas. |
-| **Herança** | `TarefaSimples`, `TarefaChecklist` e `TarefaRecorr` derivam de `Tarefa`. |
-| **Polimorfismo** | A operação `concluir()` é utilizada para diferentes tipos de tarefa, respeitando as regras de cada um. |
-| **Composição** | `TarefaChecklist` gerencia objetos `ItemChecklist`. |
-| **Associação** | `Lista` mantém tarefas e referencia uma `Categoria`; uma categoria pode ser compartilhada entre listas. |
-| **Dependência** | `GerenciadorTarefa` utiliza o enum `Prioridade` para filtrar tarefas. |
-| **Encapsulamento** | Uso de atributos internos e propriedades para acesso controlado aos dados. |
+### Tipos de tarefa
 
-## Estrutura principal
+| Tipo | Descrição |
+|------|-----------|
+| `TarefaSimples` | Tarefa com informações básicas e controle de conclusão. |
+| `TarefaChecklist` | Tarefa composta por itens que podem ser adicionados, removidos, marcados e desmarcados. |
+| `TarefaRecorr` | Tarefa que permite gerar próximas ocorrências com frequências diária, semanal, mensal ou anual. |
+
+Uma tarefa checklist só pode ser concluída quando todos os seus itens estiverem marcados.
+
+Uma nova ocorrência recorrente só pode ser gerada quando a ocorrência original estiver concluída.
+
+## Tecnologias
+
+- **Python 3**
+- **SQLite 3** (`sqlite3`)
+- **JSON** (`json`)
+- **python-dateutil**
+- **Programação Orientada a Objetos**
+
+## Conceitos de POO aplicados
+
+### Abstração
+
+A classe abstrata `Tarefa` define atributos e comportamentos comuns às tarefas.
+
+A classe abstrata `Repositorio` estabelece o contrato para as operações de persistência.
+
+### Herança
+
+As classes `TarefaSimples`, `TarefaChecklist` e `TarefaRecorr` herdam de `Tarefa`.
+
+### Polimorfismo
+
+As subclasses implementam comportamentos específicos, como o método `concluir()`.
+
+### Encapsulamento
+
+Os atributos internos das classes são protegidos e acessados por propriedades e métodos específicos.
+
+### Composição
+
+- `TarefaChecklist` possui objetos `ItemChecklist`.
+- `TarefaRecorr` possui um objeto `Recorrencia`.
+
+## Arquitetura
+
+O projeto separa as responsabilidades em três camadas principais:
 
 ```text
-To_Do_AppPy/
-├── package/
-│   ├── tarefa.py
-│   ├── tarefa_simples.py
-│   ├── tarefa_checklist.py
-│   ├── item_checklist.py
-│   ├── tarefa_recorr.py
-│   ├── recorrencia.py
-│   ├── prioridade.py
-│   ├── categoria.py
-│   ├── lista.py
-│   ├── gerenciador_tarefa.py
-│   ├── repositorio.py
-│   ├── repositorio_json.py
-│   ├── lembrete.py
-│   ├── servico_lembrete.py
-│   └── notificador.py
-├── tests/
-├── main.py
-└── README.md
+Menu
+  |
+  v
+GerenciadorTarefa
+  |
+  v
+Repositorio (ABC)
+  ^
+  |
+RepositorioSQLite
+  |
+  v
+SQLite
 ```
 
-> A estrutura acima relaciona os arquivos identificados no projeto fornecido. Os arquivos `test_nivel1.py` e `demonstracao_nivel1.py` podem ser adicionados conforme a organização local do projeto. `main.py` ainda não deve ser entendido como um menu completo.
+### Componentes principais
 
-## Requisitos
+| Componente | Responsabilidade |
+|------------|------------------|
+| `Menu` | Interface de interação pelo terminal. |
+| `GerenciadorTarefa` | Regras de negócio e gerenciamento das tarefas. |
+| `Tarefa` | Classe abstrata base das tarefas. |
+| `Repositorio` | Interface abstrata para operações CRUD. |
+| `RepositorioSQLite` | Persistência dos objetos no banco de dados. |
+| `RepositorioJson` | Leitura e escrita de arquivos JSON. |
+| `fabrica_tarefa` | Reconstrução das subclasses a partir de dicionários. |
 
-- Python 3.10 ou superior (recomendado).
-- Biblioteca [`python-dateutil`](https://pypi.org/project/python-dateutil/), utilizada no cálculo das recorrências.
+## Banco de dados SQLite
 
-Instale a dependência:
+O SQLite é utilizado como armazenamento principal do aplicativo.
+
+O banco possui três tabelas:
+
+| Tabela | Descrição |
+|--------|-----------|
+| `tarefas` | Armazena os atributos comuns das tarefas. |
+| `itens_checklist` | Armazena os itens associados aos checklists. |
+| `recorrencias` | Armazena as configurações das tarefas recorrentes. |
+
+### Características
+
+- Geração automática de identificadores.
+- Relacionamentos com chaves estrangeiras.
+- Exclusão em cascata (`ON DELETE CASCADE`).
+- Transações com `commit()` e `rollback()`.
+- Recuperação de objetos a partir dos registros SQL.
+
+O arquivo `schema.sql` define a estrutura das tabelas.
+
+## Serialização e desserialização JSON
+
+O projeto também implementa a conversão de objetos para JSON e sua reconstrução.
+
+Os métodos utilizados incluem:
+
+- `para_dict()`: converte uma tarefa para dicionário.
+- `de_dict()`: reconstrói objetos a partir de dicionários.
+- `tarefa_de_dict()`: identifica a subclasse a ser reconstruída.
+- `RepositorioJson.salvar()`: grava dados em JSON.
+- `RepositorioJson.carregar()`: lê dados de arquivos JSON.
+
+A importação e a exportação são executadas por métodos do gerenciador e verificadas por testes automatizados.
+
+**O SQLite é o armazenamento principal. O JSON é um mecanismo adicional de serialização e transferência de dados.**
+
+## Instalação e execução
+
+### 1. Clonar o repositório
 
 ```bash
-python -m pip install python-dateutil
+git clone URL_DO_SEU_REPOSITORIO
+cd to_do_app
 ```
 
-## Como executar a demonstração
+Substitua `URL_DO_SEU_REPOSITORIO` pelo endereço do repositório no GitHub.
 
-A partir da pasta raiz do projeto, com o arquivo `demonstracao_nivel1.py` ao lado da pasta `package`:
+### 2. Instalar a dependência
 
 ```bash
-python demonstracao_nivel1.py
+python3 -m pip install python-dateutil
 ```
 
-A demonstração apresenta, no terminal, exemplos de:
-
-1. Criação de listas e associação com categorias.
-2. Cadastro dos três tipos de tarefa.
-3. Inclusão e marcação de itens de checklist.
-4. Conclusão de tarefas com comportamentos diferentes.
-5. Geração da próxima ocorrência de tarefa recorrente.
-6. Filtragem por prioridade.
-7. Edição e exclusão de tarefas.
-
-### Executando o teste de integração
-
-Se o arquivo de teste estiver disponível como `tests/test_nivel1.py`, execute:
+### 3. Executar o aplicativo
 
 ```bash
-python -m tests.test_nivel1
+python3 main.py
 ```
 
-Esse teste valida cenários de funcionamento de forma automatizada. A **demonstração funcional** é um arquivo separado, voltado à apresentação do comportamento das classes. Os testes realizados até agora não garantem cobertura integral de todos os módulos.
+Na primeira execução, o programa inicializa as tabelas do SQLite utilizando o arquivo `schema.sql`.
 
-## Arquitetura e UML
+As tarefas cadastradas permanecem armazenadas nas execuções seguintes.
 
-O sistema separa as responsabilidades de **modelo de domínio**, **gerenciamento** e **persistência**.
+## Testes
 
-- `Tarefa` e subclasses representam o domínio das tarefas.
-- `GerenciadorTarefa` coordena operações sobre tarefas de uma `Lista`.
-- `Recorrencia` calcula datas e intervalos de repetição.
-- `Repositorio` define o contrato de persistência, implementado por `RepositorioJson`.
-- `MenuPrincipal` está **planejado** para oferecer interação no terminal por meio de operações de cadastro, consulta, edição e exclusão (CRUD).
-- `JanelaPrincipal` está **planejada** para a futura interface gráfica.
+O projeto possui testes de integração para verificar as operações de persistência e gerenciamento de tarefas.
 
-O diagrama de classes UML deve ser mantido em sincronia com as classes efetivamente implementadas, distinguindo os elementos ainda planejados.
+Execute os comandos na raiz do projeto:
 
-## Etapas do projeto
+```bash
+python3 -m tests.test_gerenciador_sqlite
+python3 -m tests.test_gerenciador_checklist
+python3 -m tests.test_gerenciador_recorrencia
+python3 -m tests.test_serializacao_json
+```
 
-| Etapa | Objetivo | Situação |
-| --- | --- | --- |
-| **Nível 1** | Modelagem UML, relacionamentos de POO e demonstração de funcionalidades | Demonstração integrada executada com sucesso; entrega em preparação |
-| **Nível 2** | Menu funcional para acessar os recursos do sistema | Planejado |
-| **Nível 3** | Persistência em banco de dados | Planejado |
-| **Nível 4** | Interface gráfica personalizada | Planejado |
+Os testes verificam:
 
-## Próximos passos
+- Criação e recuperação de tarefas.
+- Atualização e exclusão de registros.
+- Manipulação de checklists.
+- Conclusão e reabertura.
+- Geração de novas recorrências.
+- Persistência com SQLite.
+- Serialização e desserialização JSON.
 
-- Implementar `MenuPrincipal` sem misturar entrada/saída do terminal com as regras de negócio.
-- Ampliar a cobertura dos testes e revisar a serialização/desserialização das tarefas recorrentes.
-- Integrar a persistência ao fluxo da aplicação.
-- Evoluir os recursos de lembretes e notificações.
-- Implementar a interface gráfica em uma etapa posterior.
+## Diagrama UML
 
-## Sobre
+O diagrama UML documenta a estrutura das classes, os relacionamentos de herança e composição e a arquitetura de persistência utilizada no Nível 3.
 
-Projeto desenvolvido para fins acadêmicos e aprendizado de Python, orientação a objetos, modelagem UML e organização de software em camadas.
+## Evolução do projeto
+
+### Nível 1
+Implementação inicial do gerenciador de tarefas utilizando os fundamentos da Programação Orientada a Objetos.
+
+### Nível 2
+Ampliação do sistema com diferentes tipos de tarefas, checklists e recorrências.
+
+### Nível 3
+Refatoração da arquitetura e implementação de:
+
+- Persistência com SQLite.
+- Repositório abstrato.
+- Operações CRUD.
+- Identificadores gerados pelo banco.
+- Serialização e desserialização JSON.
+- Integração completa com a interface de terminal.
+- Testes de persistência e regras de negócio.
+
+## Apresentação
+
+O vídeo de apresentação demonstra a arquitetura do projeto, os conceitos de POO utilizados, a persistência SQLite, a serialização JSON e as principais funcionalidades do sistema.
+
+**Link do vídeo:** adicionar após a publicação.
+
+## Licença
+
+Consulte o arquivo `LICENSE`, caso exista no repositório.
