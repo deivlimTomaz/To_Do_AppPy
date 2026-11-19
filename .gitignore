@@ -15,6 +15,7 @@ venv/
 
 # Banco de dados SQLite
 tarefas.db
+*.db
 *.db-journal
 *.db-wal
 *.db-shm
