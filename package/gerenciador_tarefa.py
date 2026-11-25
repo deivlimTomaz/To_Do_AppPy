@@ -39,7 +39,44 @@ class GerenciadorTarefa:
 
         return tarefa
 
-    # Polimorfismo
+    def editar_recorrente(self, id_tarefa: int, titulo: str, descricao: str, prioridade: Prioridade, data_vencimento: date, frequencia: str, intervalo: int) -> TarefaRecorr:
+
+        from package.recorrencia import Recorrencia
+
+        tarefa = self.buscar_por_id(id_tarefa)
+
+        if not isinstance(tarefa, TarefaRecorr):
+            raise TypeError("A tarefa não é recorrente")
+
+        # Valida a nova configuração antes de modificar a tarefa.
+        nova_recorrencia = Recorrencia(
+            frequencia,
+            intervalo
+        )
+
+        # Atualiza os atributos gerais.
+        tarefa.editar(
+            titulo,
+            descricao,
+            prioridade,
+            data_vencimento
+        )
+
+        # Atualiza a configuração de recorrência.
+        tarefa.recorrencia.frequencia = (
+            nova_recorrencia.frequencia
+        )
+
+        tarefa.recorrencia.intervalo = (
+            nova_recorrencia.intervalo
+        )
+
+        # Persiste todos os dados na mesma transação.
+        self._repositorio.atualizar(tarefa)
+
+        return tarefa
+
+        # Polimorfismo
     def concluir(self, tarefa_procurada: Tarefa):
         if not isinstance(tarefa_procurada, Tarefa):
             raise TypeError("O objeto não é uma tarefa!")

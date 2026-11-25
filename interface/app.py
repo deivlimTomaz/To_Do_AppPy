@@ -5,6 +5,7 @@ from tkinter import messagebox
 from package.gerenciador_tarefa import GerenciadorTarefa
 from package.tarefa_simples import TarefaSimples
 from package.tarefa_checklist import TarefaChecklist
+from package.tarefa_recorr import TarefaRecorr
 
 from interface.tarefas_view import (
     filtrar_tarefas,
@@ -18,6 +19,9 @@ from interface.janela_checklist import JanelaChecklist
 from interface.janela_formulario_checklist import (
     JanelaFormularioChecklist
 )
+
+from interface.janela_formulario_recorr import (JanelaFormularioRecorr)
+from interface.janela_recorrencia import(JanelaRecorrencia)
 
 
 ctk.set_appearance_mode("dark")
@@ -44,6 +48,8 @@ class App(ctk.CTk):
         self.janela_detalhes = None
         self.janela_checklist = None
         self.janela_formulario_checklist = None
+        self.janela_formulario_recorr = None
+        self.janela_recorrencia = None
 
         self.title(
             "To-Do App | Gerenciador de Tarefas"
@@ -302,15 +308,15 @@ class App(ctk.CTk):
             text=titulos[secao]
         )
 
+        textos_botoes = {
+            "Tarefas": "+ Nova tarefa",
+            "Checklists": "+ Novo checklist",
+            "Recorrentes": "+ Nova recorrência"
+        }
+
         # Altera o botão de acordo com a seção.
 
-        self.botao_novo.configure(
-            text=(
-                "+ Novo checklist"
-                if secao == "Checklists"
-                else "+ Nova tarefa"
-            )
-        )
+        self.botao_novo.configure(text = textos_botoes[secao])
 
         self.atualizar_lista()
 
@@ -495,6 +501,21 @@ class App(ctk.CTk):
 
             return
 
+        # Cadastro de recorrências
+
+        if self.secao_atual == "Recorrentes":
+            if (self.janela_formulario_recorr is not None and self.janela_formulario_recorr.winfo_exists()):
+                self.janela_formulario_recorr.focus()
+                return
+
+            self.janela_formulario_recorr = (
+                JanelaFormularioRecorr(
+                    self, self.gerenciador, self.ao_cadastrar_recorrente
+                )
+            )
+
+            return
+
         # Cadastro de tarefa simples
 
         if (
@@ -524,15 +545,7 @@ class App(ctk.CTk):
 
     def abrir_detalhes(self, id_tarefa):
 
-        if (
-            self.janela_detalhes is not None
-            and self.janela_detalhes.winfo_exists()
-        ):
-            self.janela_detalhes.focus()
-            return
-
         try:
-
             tarefa = self.gerenciador.buscar_por_id(
                 id_tarefa
             )
@@ -546,6 +559,8 @@ class App(ctk.CTk):
             )
 
             return
+
+        # Checklist
 
         if isinstance(tarefa, TarefaChecklist):
 
@@ -565,7 +580,36 @@ class App(ctk.CTk):
 
             return
 
+        # Tarefa recorrente
+
+        if isinstance(tarefa, TarefaRecorr):
+
+            if (
+                self.janela_recorrencia is not None
+                and self.janela_recorrencia.winfo_exists()
+            ):
+                self.janela_recorrencia.focus()
+                return
+
+            self.janela_recorrencia = JanelaRecorrencia(
+                self,
+                self.gerenciador,
+                id_tarefa,
+                self.atualizar_lista
+            )
+
+            return
+
+        # Tarefa simples
+
         if isinstance(tarefa, TarefaSimples):
+
+            if (
+                self.janela_detalhes is not None
+                and self.janela_detalhes.winfo_exists()
+            ):
+                self.janela_detalhes.focus()
+                return
 
             self.janela_detalhes = JanelaDetalhes(
                 self,
@@ -576,17 +620,20 @@ class App(ctk.CTk):
 
             return
 
-        messagebox.showinfo(
-            "Em desenvolvimento",
-            (
-                "O gerenciamento de tarefas recorrentes "
-                "será implementado em outra etapa."
-            ),
+        messagebox.showerror(
+            "Tipo não suportado",
+            "O tipo da tarefa não foi reconhecido.",
             parent=self
         )
 
     def executar(self):
         self.mainloop()
+
+    def ao_cadastrar_recorrente(self, tarefa):
+
+        self.mostrar_secao("Recorrentes")
+
+        self.abrir_detalhes(tarefa.id)
 
 
 if __name__ == "__main__":
